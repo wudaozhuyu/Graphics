@@ -148,7 +148,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         public LightLoopSettings lightLoopSettings = new LightLoopSettings();
         
         //saved enum fields for when repainting Debug Menu
-        int m_LitShaderModeEnumIndex;
+        int m_LitShaderModeEnumIndex = 1;   //match Deferred index
 
         public FrameSettings() {
         }
@@ -203,32 +203,30 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
 
             this.lightLoopSettings.CopyTo(frameSettings.lightLoopSettings);
 
-            frameSettings.m_LitShaderModeEnumIndex = this.m_LitShaderModeEnumIndex;
+            frameSettings.Refresh();
         }
 
-        public FrameSettings Override(FrameSettings overridedFrameSettings)
+        public void ApplyOverrideOn(FrameSettings overridedFrameSettings)
         {
             if(overrides == 0)
-            {
-                //nothing to override
-                return overridedFrameSettings;
-            }
+                return;
 
-            FrameSettings result = new FrameSettings(overridedFrameSettings);
             Array values = Enum.GetValues(typeof(FrameSettingsOverrides));
             foreach(FrameSettingsOverrides val in values)
             {
                 if((val & overrides) > 0)
                 {
-                    s_Overrides[val](result, this);
+                    s_Overrides[val](overridedFrameSettings, this);
                 }
             }
 
-            result.lightLoopSettings = lightLoopSettings.Override(overridedFrameSettings.lightLoopSettings);
+            lightLoopSettings.ApplyOverrideOn(overridedFrameSettings.lightLoopSettings);
 
             //propagate override to be chained
-            result.overrides = overrides | overridedFrameSettings.overrides;
-            return result;
+            overridedFrameSettings.overrides = overrides | overridedFrameSettings.overrides;
+
+            //refresh enums for DebugMenu
+            overridedFrameSettings.Refresh();
         }
 
         // Init a FrameSettings from renderpipeline settings, frame settings and debug settings (if any)
@@ -343,7 +341,23 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
 
             LightLoopSettings.InitializeLightLoopSettings(camera, aggregate, renderPipelineSettings, srcFrameSettings, ref aggregate.lightLoopSettings);
 
-            aggregate.m_LitShaderModeEnumIndex = srcFrameSettings.m_LitShaderModeEnumIndex;
+            aggregate.Refresh();
+        }
+
+        void Refresh()
+        {
+            // actually, we need to sync up changes done in the debug menu too
+            switch(shaderLitMode)
+            {
+                case LitShaderMode.Forward:
+                    m_LitShaderModeEnumIndex = 0;
+                    break;
+                case LitShaderMode.Deferred:
+                    m_LitShaderModeEnumIndex = 1;
+                    break;
+                default:
+                    throw new ArgumentException("Unknown LitShaderMode");
+            }
         }
 
         public bool BuildLightListRunsAsync()
@@ -396,7 +410,6 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
 
                 // TODO: The work will be implemented piecemeal to support all passes
                 enableMotionVectors = enablePostprocess && !enableMSAA;
-                enableDecals = false;
                 enableSSR = false;
             }
         }
