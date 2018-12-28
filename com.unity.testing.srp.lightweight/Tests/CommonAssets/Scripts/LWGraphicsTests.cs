@@ -3,6 +3,7 @@ using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
+using UnityEngine.XR;
 using UnityEngine.TestTools.Graphics;
 using UnityEngine.SceneManagement;
 
@@ -29,10 +30,13 @@ public class LWGraphicsTests
 
         if (scene.name.Substring(3, 4).Equals("_xr_"))
         {
-            UnityEngine.XR.XRSettings.LoadDeviceByName("MockHMD");
+            XRSettings.LoadDeviceByName("MockHMD");
             yield return null;
 
-            UnityEngine.XR.XRSettings.enabled = true;
+            XRSettings.enabled = true;
+            yield return null;
+
+            XRSettings.gameViewRenderMode = GameViewRenderMode.BothEyes;
             yield return null;
 
             foreach (var camera in cameras)
