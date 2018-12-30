@@ -2,11 +2,7 @@ using System.Collections;
 using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
-<<<<<<< HEAD
 using UnityEngine.TestTools;
-=======
-using UnityEngine.TestTools;
->>>>>>> remotes/origin/stereo_gfx_tests_dennisd
 using UnityEngine.XR;
 using UnityEngine.TestTools.Graphics;
 using UnityEngine.SceneManagement;
