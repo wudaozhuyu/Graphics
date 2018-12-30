@@ -1,3 +1,6 @@
 {
-    "disableBatchMode": true
+    "disableBatchMode": true,
+    "allowedGraphicsTarget": {
+        "metal": ["intel"]
+    }
 }
