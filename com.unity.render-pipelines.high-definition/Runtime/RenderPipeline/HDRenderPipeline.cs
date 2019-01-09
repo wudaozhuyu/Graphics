@@ -769,6 +769,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
             CoreUtils.SetKeyword(cmd, "LIGHT_LAYERS", hdCamera.frameSettings.enableLightLayers);
             cmd.SetGlobalInt(HDShaderIDs._EnableLightLayers, hdCamera.frameSettings.enableLightLayers ? 1 : 0);
 
+            // configure keyword for both decal.shader and material
             if (m_Asset.renderPipelineSettings.supportDecals)
             {
                 CoreUtils.SetKeyword(cmd, "DECALS_OFF", false);
@@ -1868,11 +1869,12 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                     drawSettings.SetShaderPassName(4, HDShaderPassNames.s_MeshDecalsMSName);
                     drawSettings.SetShaderPassName(5, HDShaderPassNames.s_MeshDecalsAOSName);
                     drawSettings.SetShaderPassName(6, HDShaderPassNames.s_MeshDecalsMAOSName);
-                    drawSettings.SetShaderPassName(7, HDShaderPassNames.s_ShaderGraphMeshDecalsName);
+                    drawSettings.SetShaderPassName(7, HDShaderPassNames.s_ShaderGraphMeshDecalsName4RT);
                 }
                 else
                 {
                     drawSettings.SetShaderPassName(0, HDShaderPassNames.s_MeshDecals3RTName);
+                    drawSettings.SetShaderPassName(1, HDShaderPassNames.s_ShaderGraphMeshDecalsName3RT);
                 }
 
                 FilteringSettings filterRenderersSettings = new FilteringSettings(HDRenderQueue.k_RenderQueue_AllOpaque);
