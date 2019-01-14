@@ -164,7 +164,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Packages/com.unity.testing.srp.lightweight/Tests/Scenes/061_xr_PBS_EnvironmentBRDF_Spheres.unity
     guid: e6b6cac1cd594e246834d5cd95fb53fc
-  - enabled: 1
+  - enabled: 0
     path: Packages/com.unity.testing.srp.lightweight/Tests/Scenes/062_xr_Lighting_Scene_Directional.unity
     guid: 2332b44eb1f8c874c88a82d72c4accef
   - enabled: 1

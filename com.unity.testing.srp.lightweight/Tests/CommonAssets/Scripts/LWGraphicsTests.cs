@@ -31,6 +31,8 @@ public class LWGraphicsTests
 
         if (scene.name.Substring(3, 4).Equals("_xr_"))
         {
+            [UnityPlatform(exclude = new[] {RuntimePlatform.OSXEditor, RuntimePlatform.OSXPlayer })]
+
             XRSettings.LoadDeviceByName("MockHMD");
             yield return null;
 
