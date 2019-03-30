@@ -1,4 +1,5 @@
 using System;
+using UnityEngine.Experimental.Rendering.HDPipeline.Attributes;
 using UnityEngine.Rendering;
 //using System.Runtime.InteropServices;
 
@@ -52,21 +53,26 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
 
             // Bottom interface (2 lobes BSDF)
             // Standard parametrization
+            [MaterialSharedPropertyMapping(MaterialSharedProperty.Albedo)]
             [SurfaceDataAttributes("Base Color", false, true)]
             public Vector3 baseColor;
 
+            [MaterialSharedPropertyMapping(MaterialSharedProperty.AmbientOcclusion)]
             [SurfaceDataAttributes("Ambient Occlusion")]
             public float ambientOcclusion;
 
+            [MaterialSharedPropertyMapping(MaterialSharedProperty.Metal)]
             [SurfaceDataAttributes("Metallic")]
             public float metallic;
 
             [SurfaceDataAttributes("Dielectric IOR")]
             public float dielectricIor;
 
+            [MaterialSharedPropertyMapping(MaterialSharedProperty.Specular)]
             [SurfaceDataAttributes("Specular Color", false, true)]
             public Vector3 specularColor;
 
+            [MaterialSharedPropertyMapping(MaterialSharedProperty.Normal)]
             [SurfaceDataAttributes(new string[] {"Normal", "Normal View Space"}, true)]
             public Vector3 normalWS;
 
@@ -79,6 +85,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
             [SurfaceDataAttributes(new string[] {"Bent Normal", "Bent Normal View Space"}, true)]
             public Vector3 bentNormalWS;
 
+            [MaterialSharedPropertyMapping(MaterialSharedProperty.Smoothness)]
             [SurfaceDataAttributes("Smoothness A")]
             public float perceptualSmoothnessA;
 
@@ -154,8 +161,8 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
             public Vector3 coatExtinction;
 
             // SSS
-            [SurfaceDataAttributes("Diffusion Profile")]
-            public uint diffusionProfile;
+            [SurfaceDataAttributes("Diffusion Profile Hash")]
+            public uint diffusionProfileHash;
             [SurfaceDataAttributes("Subsurface Mask")]
             public float subsurfaceMask;
 
@@ -224,7 +231,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
             public float iridescenceMask;
 
             // SSS
-            public uint diffusionProfile;
+            public uint diffusionProfileIndex;
             public float subsurfaceMask;
 
             // Transmission

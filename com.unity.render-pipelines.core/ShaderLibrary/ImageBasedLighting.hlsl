@@ -70,13 +70,10 @@ real MipmapLevelToPerceptualRoughness(real mipmapLevel)
 // Anisotropic image based lighting
 //-----------------------------------------------------------------------------
 
-// Ref: Donald Revie - Implementing Fur Using Deferred Shading (GPU Pro 2)
-// The grain direction (e.g. hair or brush direction) is assumed to be orthogonal to the normal.
-// The returned normal is NOT normalized.
-real3 ComputeGrainNormal(real3 grainDir, real3 V)
+// T is the fiber axis (hair strand direction, root to tip).
+float3 ComputeViewFacingNormal(float3 V, float3 T)
 {
-    real3 B = cross(grainDir, V);
-    return cross(B, grainDir);
+    return Orthonormalize(V, T);
 }
 
 // Fake anisotropy by distorting the normal (non-negative anisotropy values only).
@@ -84,7 +81,7 @@ real3 ComputeGrainNormal(real3 grainDir, real3 V)
 // Anisotropic ratio (0->no isotropic; 1->full anisotropy in tangent direction)
 real3 GetAnisotropicModifiedNormal(real3 grainDir, real3 N, real3 V, real anisotropy)
 {
-    real3 grainNormal = ComputeGrainNormal(grainDir, V);
+    real3 grainNormal = ComputeViewFacingNormal(V, grainDir);
     return normalize(lerp(N, grainNormal, anisotropy));
 }
 
@@ -128,7 +125,7 @@ real3 GetSpecularDominantDir(real3 N, real3 R, real perceptualRoughness, real Nd
 // Importance sampling BSDF functions
 // ----------------------------------------------------------------------------
 
-void SampleGGXDir(real2   u,
+void SampleGGXDir2(real2   u,
                   real3   V,
                   real3x3 localToWorld,
                   real    roughness,
@@ -136,7 +133,8 @@ void SampleGGXDir(real2   u,
               out real    NdotL,
               out real    NdotH,
               out real    VdotH,
-                  bool     VeqN = false)
+              out real    LdotH,
+              bool     VeqN = false)
 {
     // GGX NDF sampling
     real cosTheta = sqrt(SafeDiv(1.0 - u.x, 1.0 + (roughness * roughness - 1.0) * u.x));
@@ -164,7 +162,23 @@ void SampleGGXDir(real2   u,
     real3 localL = -localV + 2.0 * VdotH * localH;
     NdotL = localL.z;
 
+    LdotH = saturate(dot(localL, localH));
+
     L = mul(localL, localToWorld);
+}
+
+void SampleGGXDir(real2   u,
+                  real3   V,
+                  real3x3 localToWorld,
+                  real    roughness,
+              out real3   L,
+              out real    NdotL,
+              out real    NdotH,
+              out real    VdotH,
+                  bool     VeqN = false)
+{
+    float LdotH = 0.0f;
+    SampleGGXDir2(u, V, localToWorld, roughness, L, NdotL, NdotH, VdotH, LdotH, VeqN);
 }
 
 // Ref: "A Simpler and Exact Sampling Routine for the GGX Distribution of Visible Normals".
@@ -426,7 +440,7 @@ uint GetIBLRuntimeFilterSampleCount(uint mipLevel)
 }
 
 // Ref: Listing 19 in "Moving Frostbite to PBR"
-real4 IntegrateLD(TEXTURECUBE_ARGS(tex, sampl),
+real4 IntegrateLD(TEXTURECUBE_PARAM(tex, sampl),
                    TEXTURE2D(ggxIblSamples),
                    real3 V,
                    real3 N,
@@ -542,7 +556,7 @@ real4 IntegrateLD(TEXTURECUBE_ARGS(tex, sampl),
     return real4(lightInt / cbsdfInt, 1.0);
 }
 
-real4 IntegrateLDCharlie(TEXTURECUBE_ARGS(tex, sampl),
+real4 IntegrateLDCharlie(TEXTURECUBE_PARAM(tex, sampl),
                    real3 V,
                    real3 N,
                    real roughness,
@@ -652,7 +666,7 @@ uint BinarySearchRow(uint j, real needle, TEXTURE2D(haystack), uint n)
 }
 
 #if !defined SHADER_API_GLES
-real4 IntegrateLD_MIS(TEXTURECUBE_ARGS(envMap, sampler_envMap),
+real4 IntegrateLD_MIS(TEXTURECUBE_PARAM(envMap, sampler_envMap),
                        TEXTURE2D(marginalRowDensities),
                        TEXTURE2D(conditionalDensities),
                        real3 V,

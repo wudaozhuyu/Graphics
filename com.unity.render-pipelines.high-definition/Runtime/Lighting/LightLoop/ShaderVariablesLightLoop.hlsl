@@ -22,6 +22,8 @@
 
     // Used by directional and spot lights
     TEXTURE2D_ARRAY(_CookieTextures);
+    // Used by area lights
+    TEXTURE2D_ARRAY(_AreaCookieTextures);
 
     // Used by point lights
     TEXTURECUBE_ARRAY_ABSTRACT(_CookieCubeTextures);
@@ -30,7 +32,15 @@
     TEXTURECUBE_ARRAY_ABSTRACT(_EnvCubemapTextures);
     TEXTURE2D_ARRAY(_Env2DTextures);
 
-    // XRTODO: Need to stereo-ize access
-    TEXTURE2D(_DeferredShadowTexture);
+    // Contact shadows
+    TEXTURE2D_X(_DeferredShadowTexture);
+
+#if SHADEROPTIONS_RAYTRACING
+    // Area shadow paper texture
+    TEXTURE2D_ARRAY(_AreaShadowTexture);
+
+    // Indirect Diffuse Texture
+    TEXTURE2D(_IndirectDiffuseTexture);
+#endif
 
 #endif

@@ -14,11 +14,13 @@
 //#pragma #pragma enable_d3d11_debug_symbols
 
 #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
+#include "Packages/com.unity.render-pipelines.high-definition/Runtime/ShaderLibrary/TextureXR.hlsl"
 #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Lighting/LightLoop/ShaderBase.hlsl"
 #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Lighting/LightLoop/LightLoop.cs.hlsl"
 #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Lighting/LightLoop/LightingConvexHullUtils.hlsl"
+#include "Packages/com.unity.render-pipelines.high-definition/Runtime/Lighting/LightLoop/LightCullUtils.hlsl"
 
-#if !defined(SHADER_API_XBOXONE) && !defined(SHADER_API_PSSL)
+#if !defined(SHADER_API_XBOXONE) && !defined(SHADER_API_PSSL) && !defined(SHADER_API_SWITCH)
 #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Lighting/LightLoop/SortingComputeUtils.hlsl"
 #endif
 
@@ -30,14 +32,13 @@
 
 uniform int g_iNrVisibLights;
 uniform uint2 g_viDimensions;
-uniform float4x4 g_mInvScrProjection;
-uniform float4x4 g_mScrProjection;
+uniform float4x4 g_mInvScrProjectionArr[2];
+uniform float4x4 g_mScrProjectionArr[2];
 uniform uint g_isOrthographic;
 uniform int _EnvLightIndexShift;
 uniform int _DecalIndexShift;
 uniform uint g_BaseFeatureFlags;
 
-Texture2D g_depth_tex : register( t0 );
 StructuredBuffer<float4> g_vBoundsBuffer : register( t1 );
 StructuredBuffer<LightVolumeData> _LightVolumeData : register(t2);
 StructuredBuffer<SFiniteLightBound> g_data : register( t3 );
@@ -46,7 +47,13 @@ StructuredBuffer<SFiniteLightBound> g_data : register( t3 );
 StructuredBuffer<uint> g_vBigTileLightList : register( t4 );        // don't support Buffer yet in unity
 #endif
 
-#define NR_THREADS          64
+#ifdef PLATFORM_LANE_COUNT                                          // We can infer the size of a wave. This is currently not possible on non-consoles, so we have to fallback to a sensible default in those cases.
+#define NR_THREADS              PLATFORM_LANE_COUNT  
+#else
+#define NR_THREADS              64                                  // default to 64 threads per group on other platforms..
+#endif
+
+#define PIXEL_PER_THREAD      ((TILE_SIZE_FPTL*TILE_SIZE_FPTL) / NR_THREADS) // 8 or 4
 
 // output buffer
 RWStructuredBuffer<uint> g_vLightList : register( u0 );             // don't support RWBuffer yet in unity
@@ -81,6 +88,8 @@ RWStructuredBuffer<uint> g_TileFeatureFlags;
 
 float GetLinearDepth(float2 pixXY, float zDptBufSpace)    // 0 is near 1 is far
 {
+    float4x4 g_mInvScrProjection = g_mInvScrProjectionArr[unity_StereoEyeIndex];
+
 #ifdef USE_OBLIQUE_MODE
 	float2 res2 = mul(g_mInvScrProjection, float4(pixXY, zDptBufSpace, 1.0)).zw;
 	return res2.x / res2.y;
@@ -96,6 +105,8 @@ float GetLinearDepth(float2 pixXY, float zDptBufSpace)    // 0 is near 1 is far
 
 float3 GetViewPosFromLinDepth(float2 v2ScrPos, float fLinDepth)
 {
+    float4x4 g_mScrProjection = g_mScrProjectionArr[unity_StereoEyeIndex];
+
     bool isOrthographic = g_isOrthographic!=0;
     float fSx = g_mScrProjection[0].x;
     float fSy = g_mScrProjection[1].y;
@@ -116,6 +127,7 @@ float3 GetViewPosFromLinDepth(float2 v2ScrPos, float fLinDepth)
 
 float GetOnePixDiagWorldDistAtDepthOne()
 {
+    float4x4 g_mScrProjection = g_mScrProjectionArr[unity_StereoEyeIndex];
     float fSx = g_mScrProjection[0].x;
     float fSy = g_mScrProjection[1].y;
 
@@ -127,12 +139,17 @@ int SphericalIntersectionTests(uint threadID, int iNrCoarseLights, float2 screen
 #endif
 
 #ifdef FINE_PRUNING_ENABLED
+#if PIXEL_PER_THREAD == 4
 void FinePruneLights(uint threadID, int iNrCoarseLights, uint2 viTilLL, float4 vLinDepths);
+#else
+void FinePruneLights(uint threadID, int iNrCoarseLights, uint2 viTilLL, float vLinDepths[PIXEL_PER_THREAD]);
+#endif
 #endif
 
 [numthreads(NR_THREADS, 1, 1)]
-void LIGHTLISTGEN(uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID)
+void LIGHTLISTGEN(uint3 dispatchThreadId : SV_DispatchThreadID, uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID)
 {
+    UNITY_STEREO_ASSIGN_COMPUTE_EYE_INDEX(dispatchThreadId.z);
     uint2 tileIDX = u3GroupID.xy;
     uint t=threadID;
 
@@ -154,7 +171,7 @@ void LIGHTLISTGEN(uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID)
         lightOffs = 0;
     }
 
-#if !defined(SHADER_API_XBOXONE) && !defined(SHADER_API_PSSL)
+#if NR_THREADS > PLATFORM_LANE_COUNT
     GroupMemoryBarrierWithGroupSync();
 #endif
 
@@ -165,15 +182,19 @@ void LIGHTLISTGEN(uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID)
     float dpt_mi=asfloat(uFltMax), dpt_ma=0.0;
 
 
+#if PIXEL_PER_THREAD == 4
     float4 vLinDepths;
+#else
+    float vLinDepths[PIXEL_PER_THREAD];
+#endif
     {
         // Fetch depths and calculate min/max
         UNITY_UNROLL
-        for(int i = 0; i < 4; i++)
+        for(int i = 0; i < PIXEL_PER_THREAD; i++)
         {
             int idx = i * NR_THREADS + t;
             uint2 uCrd = min( uint2(viTilLL.x+(idx&0xf), viTilLL.y+(idx>>4)), uint2(iWidth-1, iHeight-1) );
-            const float fDepth = FetchDepth(g_depth_tex, uCrd);
+            const float fDepth = FetchDepth(uCrd);
             vLinDepths[i] = GetLinearDepth(uCrd+float2(0.5,0.5), fDepth);
             if(fDepth<VIEWPORT_SCALE_Z)     // if not skydome
             {
@@ -185,8 +206,7 @@ void LIGHTLISTGEN(uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID)
         InterlockedMax(ldsZMax, asuint(dpt_ma));
         InterlockedMin(ldsZMin, asuint(dpt_mi));
 
-
-#if !defined(SHADER_API_XBOXONE) && !defined(SHADER_API_PSSL)
+#if NR_THREADS > PLATFORM_LANE_COUNT || defined(SHADER_API_SWITCH) // not sure why Switch needs the barrier (it will not be correct without)
         GroupMemoryBarrierWithGroupSync();
 #endif
     }
@@ -201,8 +221,10 @@ void LIGHTLISTGEN(uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID)
 #ifdef USE_TWO_PASS_TILED_LIGHTING
     const uint log2BigTileToTileRatio = firstbithigh(64) - firstbithigh(16);
 
-    int NrBigTilesX = (nrTilesX+((1<<log2BigTileToTileRatio)-1))>>log2BigTileToTileRatio;
-    const int bigTileIdx = (tileIDX.y>>log2BigTileToTileRatio)*NrBigTilesX + (tileIDX.x>>log2BigTileToTileRatio);       // map the idx to 64x64 tiles
+    int NrBigTilesX = (nrTilesX + ((1 << log2BigTileToTileRatio) -1 )) >> log2BigTileToTileRatio;
+    int NrBigTilesY = (nrTilesY + ((1 << log2BigTileToTileRatio) - 1)) >> log2BigTileToTileRatio;
+    const int bigTileBase = unity_StereoEyeIndex * NrBigTilesX * NrBigTilesY;
+    const int bigTileIdx = bigTileBase + (tileIDX.y>>log2BigTileToTileRatio)*NrBigTilesX + (tileIDX.x>>log2BigTileToTileRatio);       // map the idx to 64x64 tiles
     int nrBigTileLights = g_vBigTileLightList[MAX_NR_BIG_TILE_LIGHTS_PLUS_ONE*bigTileIdx+0];
     for(int l0=(int) t; l0<(int) nrBigTileLights; l0 += NR_THREADS)
     {
@@ -214,8 +236,9 @@ void LIGHTLISTGEN(uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID)
         // Skip density volumes (lights are sorted by category). TODO: improve data locality
         if (_LightVolumeData[l].lightCategory == LIGHTCATEGORY_DENSITY_VOLUME) { break; }
 
-        const float3 vMi = g_vBoundsBuffer[l].xyz;
-        const float3 vMa = g_vBoundsBuffer[l+g_iNrVisibLights].xyz;
+        const ScreenSpaceBoundsIndices boundsIndices = GenerateScreenSpaceBoundsIndices(l, g_iNrVisibLights, unity_StereoEyeIndex);
+        const float3 vMi = g_vBoundsBuffer[boundsIndices.min].xyz;
+        const float3 vMa = g_vBoundsBuffer[boundsIndices.max].xyz;
 
         if( all(vMa>vTileLL) && all(vMi<vTileUR))
         {
@@ -230,7 +253,7 @@ void LIGHTLISTGEN(uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID)
     if(t<2) ldsDoesLightIntersect[t] = 0;
 #endif
 
-#if !defined(SHADER_API_XBOXONE) && !defined(SHADER_API_PSSL)
+#if NR_THREADS > PLATFORM_LANE_COUNT
     GroupMemoryBarrierWithGroupSync();
 #endif
 
@@ -258,7 +281,7 @@ void LIGHTLISTGEN(uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID)
     if(t==0) ldsFeatureFlags=0;
 #endif
 
-#if !defined(SHADER_API_XBOXONE) && !defined(SHADER_API_PSSL)
+#if NR_THREADS > PLATFORM_LANE_COUNT
     GroupMemoryBarrierWithGroupSync();
 #endif
 
@@ -266,14 +289,16 @@ void LIGHTLISTGEN(uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID)
     int nrLightsCombinedList = min(ldsNrLightsFinal,MAX_NR_COARSE_ENTRIES);
     for(int i=t; i<nrLightsCombinedList; i+=NR_THREADS)
     {
-        InterlockedAdd(ldsCategoryListCount[_LightVolumeData[prunedList[i]].lightCategory], 1);
+        const int lightBoundIndex = GenerateLightCullDataIndex(prunedList[i], g_iNrVisibLights, unity_StereoEyeIndex);
+
+        InterlockedAdd(ldsCategoryListCount[_LightVolumeData[lightBoundIndex].lightCategory], 1);
 #ifdef USE_FEATURE_FLAGS
-        InterlockedOr(ldsFeatureFlags, _LightVolumeData[prunedList[i]].featureFlags);
+        InterlockedOr(ldsFeatureFlags, _LightVolumeData[lightBoundIndex].featureFlags);
 #endif
     }
 
     // sort lights (gives a more efficient execution in both deferred and tiled forward lighting).
-#if !defined(SHADER_API_XBOXONE) && !defined(SHADER_API_PSSL)
+#if NR_THREADS > PLATFORM_LANE_COUNT
     SORTLIST(prunedList, nrLightsCombinedList, MAX_NR_COARSE_ENTRIES, t, NR_THREADS);
     //MERGESORTLIST(prunedList, coarseList, nrLightsCombinedList, t, NR_THREADS);
 #endif
@@ -289,13 +314,18 @@ void LIGHTLISTGEN(uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID)
             featureFlags = 0;
         }
 
-        g_TileFeatureFlags[tileIDX.y * nrTilesX + tileIDX.x] = featureFlags;
+        g_TileFeatureFlags[tileIDX.y * nrTilesX + tileIDX.x + unity_StereoEyeIndex * nrTilesX * nrTilesY] = featureFlags;
     }
 #endif
 
     // write lights to global buffers
     int localOffs=0;
     int offs = tileIDX.y*nrTilesX + tileIDX.x;
+
+#if defined(UNITY_STEREO_INSTANCING_ENABLED)
+    // Eye base offset must match code in GetCountAndStartTile()
+    offs += unity_StereoEyeIndex * nrTilesX * nrTilesY * LIGHTCATEGORY_COUNT;
+#endif
 
     // All our cull data are in the same list, but at render time envLights are separated so we need to shift the index
     // to make it work correctly
@@ -336,7 +366,7 @@ int SphericalIntersectionTests(uint threadID, int iNrCoarseLights, float2 screen
     for(l=threadID; l<iNrCoarseLights; l+=NR_THREADS)
         prunedList[l]=coarseList[l];
 
-#if !defined(SHADER_API_XBOXONE) && !defined(SHADER_API_PSSL)
+#if NR_THREADS > PLATFORM_LANE_COUNT
     GroupMemoryBarrierWithGroupSync();
 #endif
 
@@ -351,7 +381,8 @@ int SphericalIntersectionTests(uint threadID, int iNrCoarseLights, float2 screen
 
     for(l=threadID; l<iNrCoarseLights; l+=NR_THREADS)
     {
-        SFiniteLightBound lightData = g_data[prunedList[l]];
+        const int lightBoundIndex = GenerateLightCullDataIndex(prunedList[l], g_iNrVisibLights, unity_StereoEyeIndex);
+        SFiniteLightBound lightData = g_data[lightBoundIndex];
 
         if( DoesSphereOverlapTile(V, halfTileSizeAtZDistOne, lightData.center.xyz, lightData.radius, g_isOrthographic!=0) )
         {
@@ -361,7 +392,7 @@ int SphericalIntersectionTests(uint threadID, int iNrCoarseLights, float2 screen
         }
     }
 
-#if !defined(SHADER_API_XBOXONE) && !defined(SHADER_API_PSSL)
+#if NR_THREADS > PLATFORM_LANE_COUNT
     GroupMemoryBarrierWithGroupSync();
 #endif
 
@@ -373,7 +404,11 @@ int SphericalIntersectionTests(uint threadID, int iNrCoarseLights, float2 screen
 #ifdef FINE_PRUNING_ENABLED
 // initializes ldsNrLightsFinal with the number of accepted lights.
 // all accepted entries delivered in prunedList[].
-void FinePruneLights(uint threadID, int iNrCoarseLights, uint2 viTilLL, float4 vLinDepths)
+#if PIXEL_PER_THREAD == 4
+void FinePruneLights(uint threadID, int iNrCoarseLights, uint2 viTilLL, float4 vLinDepths) // keep float4 vectorization when possible, as shader compiler may generate bad code for array of floats.
+#else
+void FinePruneLights(uint threadID, int iNrCoarseLights, uint2 viTilLL, float vLinDepths[PIXEL_PER_THREAD])
+#endif
 {
     uint t = threadID;
     uint iWidth = g_viDimensions.x;
@@ -386,7 +421,7 @@ void FinePruneLights(uint threadID, int iNrCoarseLights, uint2 viTilLL, float4 v
     while(l<iNrCoarseLights)
     {
         // fetch light
-        int idxCoarse = l<iNrCoarseLights ? coarseList[l] : 0;
+        int idxCoarse = l<iNrCoarseLights ? GenerateLightCullDataIndex(coarseList[l], g_iNrVisibLights, unity_StereoEyeIndex) : 0;
         uint uLightVolume = l<iNrCoarseLights ? _LightVolumeData[idxCoarse].lightVolume : 0;
 
         // spot
@@ -396,9 +431,9 @@ void FinePruneLights(uint threadID, int iNrCoarseLights, uint2 viTilLL, float4 v
             // TODO: Change by SebL
             const bool bIsSpotDisc = true; // (lightData.flags&IS_CIRCULAR_SPOT_SHAPE) != 0;
 
-            // serially check 4 pixels
+            // serially check PIXEL_PER_THREAD pixels
             uint uVal = 0;
-            for(int i=0; i<4; i++)
+            for(int i=0; i<PIXEL_PER_THREAD; i++)
             {
                 int idx = t + i*NR_THREADS;
 
@@ -426,9 +461,9 @@ void FinePruneLights(uint threadID, int iNrCoarseLights, uint2 viTilLL, float4 v
         {
             LightVolumeData lightData = _LightVolumeData[idxCoarse];
 
-            // serially check 4 pixels
+            // serially check PIXEL_PER_THREAD pixels
             uint uVal = 0;
-            for(int i=0; i<4; i++)
+            for(int i=0; i<PIXEL_PER_THREAD; i++)
             {
                 int idx = t + i*NR_THREADS;
 
@@ -453,9 +488,9 @@ void FinePruneLights(uint threadID, int iNrCoarseLights, uint2 viTilLL, float4 v
         {
             LightVolumeData lightData = _LightVolumeData[idxCoarse];
 
-            // serially check 4 pixels
+            // serially check PIXEL_PER_THREAD pixels
             uint uVal = 0;
-            for(int i=0; i<4; i++)
+            for(int i=0; i<PIXEL_PER_THREAD; i++)
             {
                 int idx = t + i*NR_THREADS;
 
@@ -483,7 +518,7 @@ void FinePruneLights(uint threadID, int iNrCoarseLights, uint2 viTilLL, float4 v
     InterlockedOr(ldsDoesLightIntersect[1], uLightsFlags[1]);
     if(t==0) ldsNrLightsFinal = 0;
 
-#if !defined(SHADER_API_XBOXONE) && !defined(SHADER_API_PSSL)
+#if NR_THREADS > PLATFORM_LANE_COUNT
     GroupMemoryBarrierWithGroupSync();
 #endif
 

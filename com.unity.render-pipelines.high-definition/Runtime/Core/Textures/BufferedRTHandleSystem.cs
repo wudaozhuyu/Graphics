@@ -52,6 +52,9 @@ namespace UnityEngine.Experimental.Rendering
         RTHandleSystem m_RTHandleSystem = new RTHandleSystem();
         bool m_DisposedValue = false;
 
+        public int maxWidth { get { return m_RTHandleSystem.GetMaxWidth(); } }
+        public int maxHeight { get { return m_RTHandleSystem.GetMaxHeight(); } }
+
         /// <summary>
         /// Return the frame RT or null.
         /// </summary>
@@ -139,6 +142,7 @@ namespace UnityEngine.Experimental.Rendering
             {
                 if (disposing)
                 {
+                    ReleaseAll();
                     m_RTHandleSystem.Dispose();
                     m_RTHandleSystem = null;
                 }

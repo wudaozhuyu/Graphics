@@ -10,6 +10,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         HTileForSSS,
         Forward,
         RenderSSAO,
+        ResolveSSAO,
         RenderShadows,
         ScreenSpaceShadows,
         BuildLightList,
@@ -22,6 +23,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         DBufferRender,
         DBufferPrepareDrawData,
         DBufferNormal,
+        DecalsForwardEmissive,
         DisplayDebugDecalsAtlas,
         DisplayDebugViewMaterial,
         DebugViewMaterialGBuffer,
@@ -33,11 +35,12 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         ForwardTransparentDepthPrepass,
         RenderForwardError,
         TransparentDepthPostpass,
-        ObjectsVelocity,
-        CameraVelocity,
+        ObjectsMotionVector,
+        CameraMotionVectors,
         ColorPyramid,
         DepthPyramid,
         PostProcessing,
+        AfterPostProcessing,
         RenderDebug,
         ClearBuffers,
         ClearDepthStencil,
@@ -55,6 +58,16 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         GizmosPrePostprocess,
         Gizmos,
 
+        RaytracingBuildCluster,
+        RaytracingCullLights,
+        RaytracingIntegrateReflection,
+        RaytracingFilterReflection,
+        RaytracingAmbientOcclusion,
+        RaytracingFilterAO,
+        RaytracingShadowIntegration,
+        RaytracingShadowCombination,
+        RaytracingDebug,
+
         // Profile sampler for tile pass
         TPPrepareLightsForGPU,
         TPPushGlobalParameters,
@@ -68,6 +81,39 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
 
         // Misc
         VolumeUpdate,
+
+        // Low res transparency
+        DownsampleDepth,
+        LowResTransparent,
+        UpsampleLowResTransparent,
+
+        // Post-processing
+        StopNaNs,
+        Exposure,
+        TemporalAntialiasing,
+        DepthOfField,
+        DepthOfFieldKernel,
+        DepthOfFieldCoC,
+        DepthOfFieldPrefilter,
+        DepthOfFieldPyramid,
+        DepthOfFieldDilate,
+        DepthOfFieldTileMax,
+        DepthOfFieldGatherFar,
+        DepthOfFieldGatherNear,
+        DepthOfFieldPreCombine,
+        DepthOfFieldCombine,
+        MotionBlur,
+        MotionBlurMotionVecPrep,
+        MotionBlurTileMinMax,
+        MotionBlurTileNeighbourhood,
+        MotionBlurKernel,
+        PaniniProjection,
+        Bloom,
+        ColorGradingLUTBuilder,
+        UberPost,
+        FXAA,
+        SMAA,
+        FinalPost,
 
         Max
     }

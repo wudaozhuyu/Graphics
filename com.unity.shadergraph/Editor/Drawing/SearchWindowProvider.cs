@@ -14,7 +14,7 @@ namespace UnityEditor.ShaderGraph.Drawing
     class SearchWindowProvider : ScriptableObject, ISearchWindowProvider
     {
         EditorWindow m_EditorWindow;
-        AbstractMaterialGraph m_Graph;
+        GraphData m_Graph;
         GraphView m_GraphView;
         Texture2D m_Icon;
         public ShaderPort connectedPort { get; set; }
@@ -22,7 +22,7 @@ namespace UnityEditor.ShaderGraph.Drawing
         public SlotReference targetSlotReference { get; private set; }
         public Vector2 targetPosition { get; private set; }
 
-        public void Initialize(EditorWindow editorWindow, AbstractMaterialGraph graph, GraphView graphView)
+        public void Initialize(EditorWindow editorWindow, GraphData graph, GraphView graphView)
         {
             m_EditorWindow = editorWindow;
             m_Graph = graph;
@@ -75,23 +75,24 @@ namespace UnityEditor.ShaderGraph.Drawing
                 }
             }
 
-            if (!(m_Graph is SubGraph))
+            foreach (var guid in AssetDatabase.FindAssets(string.Format("t:{0}", typeof(SubGraphAsset))))
             {
-                foreach (var guid in AssetDatabase.FindAssets(string.Format("t:{0}", typeof(MaterialSubGraphAsset))))
+                var asset = AssetDatabase.LoadAssetAtPath<SubGraphAsset>(AssetDatabase.GUIDToAssetPath(guid));
+                var node = new SubGraphNode { subGraphAsset = asset };
+                if (node.subGraphData.descendents.Contains(m_Graph.assetGuid) || node.subGraphData.assetGuid == m_Graph.assetGuid)
                 {
-                    var asset = AssetDatabase.LoadAssetAtPath<MaterialSubGraphAsset>(AssetDatabase.GUIDToAssetPath(guid));
-                    var node = new SubGraphNode { subGraphAsset = asset };
+                    continue;
+                }
 
-                    if (string.IsNullOrEmpty(asset.subGraph.path))
-                    {
-                        AddEntries(node, new string[1] { asset.name }, nodeEntries);
-                    }
-                    else
-                    {
-                        var title = asset.subGraph.path.Split('/').ToList();
-                        title.Add(asset.name);
-                        AddEntries(node, title.ToArray(), nodeEntries);
-                    }
+                if (string.IsNullOrEmpty(node.subGraphData.path))
+                {
+                    AddEntries(node, new string[1] { asset.name }, nodeEntries);
+                }
+                else
+                {
+                    var title = node.subGraphData.path.Split('/').ToList();
+                    title.Add(asset.name);
+                    AddEntries(node, title.ToArray(), nodeEntries);
                 }
             }
 
@@ -184,9 +185,9 @@ namespace UnityEditor.ShaderGraph.Drawing
 
         void AddEntries(AbstractMaterialNode node, string[] title, List<NodeEntry> nodeEntries)
         {
-            if (m_Graph is SubGraph && !node.allowedInSubGraph)
+            if (m_Graph.isSubGraph && !node.allowedInSubGraph)
                 return;
-            if (m_Graph is MaterialGraph && !node.allowedInMainGraph)
+            if (!m_Graph.isSubGraph && !node.allowedInMainGraph)
                 return;
             if (connectedPort == null)
             {

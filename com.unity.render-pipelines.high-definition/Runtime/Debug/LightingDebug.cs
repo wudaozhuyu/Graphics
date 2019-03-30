@@ -13,14 +13,16 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         VisualizeCascade,
         VisualizeShadowMasks,
         IndirectDiffuseOcclusion,
-        IndirectSpecularOcclusion,
+        IndirectSpecularOcclusion
     }
 
     [GenerateHLSL]
     public enum ShadowMapDebugMode
     {
         None,
-        VisualizeAtlas,
+        VisualizePunctualLightAtlas,
+        VisualizeDirectionalLightAtlas,
+        VisualizeAreaLightAtlas,
         VisualizeShadowMap,
         SingleShadow,
     }
@@ -64,7 +66,6 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         public Color                overrideSpecularColorValue = new Color(1.0f, 1.0f, 1.0f);
         public bool                 overrideEmissiveColor = false;
         public Color                overrideEmissiveColorValue = new Color(1.0f, 1.0f, 1.0f);
-
 
         public bool                 displaySkyReflection = false;
         public float                skyReflectionMipmap = 0.0f;

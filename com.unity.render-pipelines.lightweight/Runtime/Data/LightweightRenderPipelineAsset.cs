@@ -4,8 +4,6 @@ using UnityEditor;
 using UnityEditor.ProjectWindowCallback;
 #endif
 
-using UnityEngine.Experimental.Rendering.LWRP;
-
 namespace UnityEngine.Rendering.LWRP
 {
     public enum ShadowCascadesOption
@@ -52,6 +50,7 @@ namespace UnityEngine.Rendering.LWRP
         Standard,
         Particle,
         Terrain,
+        Sprite,
         UnityBuiltinDefault
     }
 
@@ -69,14 +68,23 @@ namespace UnityEngine.Rendering.LWRP
         AllShaders,
     }
 
+    public enum RendererType
+    {
+        Custom,
+        ForwardRenderer,
+    }
+
     public class LightweightRenderPipelineAsset : RenderPipelineAsset, ISerializationCallbackReceiver
     {
         Shader m_DefaultShader;
-        internal IRendererSetup m_RendererSetup;
+        internal ScriptableRenderer m_Renderer;
 
         // Default values set when a new LightweightRenderPipeline asset is created
         [SerializeField] int k_AssetVersion = 4;
 
+        [SerializeField] RendererType m_RendererType = RendererType.ForwardRenderer;
+        [SerializeField] internal ScriptableRendererData m_RendererData = null;
+        
         // General settings
         [SerializeField] bool m_RequireDepthTexture = false;
         [SerializeField] bool m_RequireOpaqueTexture = false;
@@ -84,7 +92,7 @@ namespace UnityEngine.Rendering.LWRP
 
         // Quality settings
         [SerializeField] bool m_SupportsHDR = false;
-        [SerializeField] MsaaQuality m_MSAA = MsaaQuality._4x;
+        [SerializeField] MsaaQuality m_MSAA = MsaaQuality.Disabled;
         [SerializeField] float m_RenderScale = 1.0f;
         // TODO: Shader Quality Tiers
 
@@ -101,7 +109,7 @@ namespace UnityEngine.Rendering.LWRP
 
         // Shadows Settings
         [SerializeField] float m_ShadowDistance = 50.0f;
-        [SerializeField] ShadowCascadesOption m_ShadowCascades = ShadowCascadesOption.FourCascades;
+        [SerializeField] ShadowCascadesOption m_ShadowCascades = ShadowCascadesOption.NoCascades;
         [SerializeField] float m_Cascade2Split = 0.25f;
         [SerializeField] Vector3 m_Cascade4Split = new Vector3(0.067f, 0.2f, 0.467f);
         [SerializeField] float m_ShadowDepthBias = 1.0f;
@@ -109,10 +117,9 @@ namespace UnityEngine.Rendering.LWRP
         [SerializeField] bool m_SoftShadowsSupported = false;
 
         // Advanced settings
-        [SerializeField] bool m_UseSRPBatcher = false;
-        [SerializeField] bool m_SupportsDynamicBatching = true;
+        [SerializeField] bool m_UseSRPBatcher = true;
+        [SerializeField] bool m_SupportsDynamicBatching = false;
         [SerializeField] bool m_MixedLightingSupported = true;
-        // TODO: Render Pipeline Batcher
 
         // Deprecated settings
         [SerializeField] ShadowQuality m_ShadowType = ShadowQuality.HardShadows;
@@ -121,12 +128,11 @@ namespace UnityEngine.Rendering.LWRP
         [SerializeField] int m_MaxPixelLights = 0;
         [SerializeField] ShadowResolution m_ShadowAtlasResolution = ShadowResolution._256;
 
-        [SerializeField] LightweightRenderPipelineResources m_ResourcesAsset = null;
         [SerializeField] ShaderVariantLogLevel m_ShaderVariantLogLevel = ShaderVariantLogLevel.Disabled;
 
 #if UNITY_EDITOR
         [NonSerialized]
-        LightweightRenderPipelineEditorResources m_EditorResourcesAsset;
+        internal LightweightRenderPipelineEditorResources m_EditorResourcesAsset;
 
         static readonly string s_SearchPathProject = "Assets";
         static readonly string s_SearchPathPackage = "Packages/com.unity.render-pipelines.lightweight";
@@ -134,11 +140,12 @@ namespace UnityEngine.Rendering.LWRP
         public static LightweightRenderPipelineAsset Create()
         {
             var instance = CreateInstance<LightweightRenderPipelineAsset>();
+
+            instance.LoadBuiltinRendererData();
             instance.m_EditorResourcesAsset = LoadResourceFile<LightweightRenderPipelineEditorResources>();
-            instance.m_ResourcesAsset = LoadResourceFile<LightweightRenderPipelineResources>();
             return instance;
         }
- 
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812")]
         internal class CreateLightweightPipelineAsset : EndNameEditAction
         {
@@ -148,18 +155,11 @@ namespace UnityEngine.Rendering.LWRP
             }
         }
 
-        [MenuItem("Assets/Create/Rendering/Lightweight Render Pipeline Asset", priority = CoreUtils.assetCreateMenuPriority1)]
+        [MenuItem("Assets/Create/Rendering/Lightweight Render Pipeline/Pipeline Asset", priority = CoreUtils.assetCreateMenuPriority1)]
         static void CreateLightweightPipeline()
         {
             ProjectWindowUtil.StartNameEditingIfProjectWindowExists(0, CreateInstance<CreateLightweightPipelineAsset>(),
                 "LightweightRenderPipelineAsset.asset", null, null);
-        }
-
-        //[MenuItem("Assets/Create/Rendering/Lightweight Pipeline Resources", priority = CoreUtils.assetCreateMenuPriority1)]
-        static void CreateLightweightPipelineResources()
-        {
-            var instance = CreateInstance<LightweightRenderPipelineResources>();
-            AssetDatabase.CreateAsset(instance, string.Format("Assets/{0}.asset", typeof(LightweightRenderPipelineResources).Name));
         }
 
         //[MenuItem("Assets/Create/Rendering/Lightweight Pipeline Editor Resources", priority = CoreUtils.assetCreateMenuPriority1)]
@@ -201,26 +201,44 @@ namespace UnityEngine.Rendering.LWRP
             }
         }
 #endif
-        LightweightRenderPipelineResources resources
+
+        public ScriptableRendererData LoadBuiltinRendererData()
         {
-            get
+            switch (m_RendererType)
             {
+                // Forward Renderer is the fallback renderer that works on all platforms
+                default:
 #if UNITY_EDITOR
-                if (m_ResourcesAsset == null)
-                    m_ResourcesAsset = LoadResourceFile<LightweightRenderPipelineResources>();
+                    m_RendererData = LoadResourceFile<ForwardRendererData>();
+#else
+                    m_RendererData = null;
 #endif
-                return m_ResourcesAsset;
+                    break;
             }
+
+            return m_RendererData;
         }
 
         protected override RenderPipeline CreatePipeline()
         {
+            if (m_RendererData == null)
+                LoadBuiltinRendererData();
+
+            // If no data we can't create pipeline instance
+            if (m_RendererData == null)
+                return null;
+
+            m_Renderer = m_RendererData.InternalCreateRenderer();
             return new LightweightRenderPipeline(this);
         }
 
         Material GetMaterial(DefaultMaterialType materialType)
         {
 #if UNITY_EDITOR
+            var material = scriptableRendererData.GetDefaultMaterial(materialType);
+            if (material != null)
+                return material;
+
             if (editorResources == null)
                 return null;
 
@@ -244,9 +262,26 @@ namespace UnityEngine.Rendering.LWRP
 #endif
         }
 
-        public IRendererSetup rendererSetup
+        public ScriptableRenderer scriptableRenderer
         {
-            get { return m_RendererSetup; }
+            get
+            {
+                if (scriptableRendererData.isInvalidated || m_Renderer == null)
+                    m_Renderer = scriptableRendererData.InternalCreateRenderer();
+
+                return m_Renderer;
+            }
+        }
+
+        internal ScriptableRendererData scriptableRendererData
+        {
+            get
+            {
+                if (m_RendererData == null)
+                    CreatePipeline();
+
+                return m_RendererData;
+            }
         }
 
         public bool supportsCameraDepthTexture
@@ -264,7 +299,6 @@ namespace UnityEngine.Rendering.LWRP
         public Downsampling opaqueDownsampling
         {
             get { return m_OpaqueDownsampling; }
-            set { m_OpaqueDownsampling = value; }
         }
 
         public bool supportsHDR
@@ -420,7 +454,7 @@ namespace UnityEngine.Rendering.LWRP
 
         public override Material default2DMaterial
         {
-            get { return GetMaterial(DefaultMaterialType.UnityBuiltinDefault); }
+            get { return GetMaterial(DefaultMaterialType.Sprite); }
         }
 
         public override Shader defaultShader
@@ -428,7 +462,7 @@ namespace UnityEngine.Rendering.LWRP
             get
             {
                 if (m_DefaultShader == null)
-                    m_DefaultShader = Shader.Find(ShaderUtils.GetShaderPath(ShaderPathID.PhysicallyBased));
+                    m_DefaultShader = Shader.Find(ShaderUtils.GetShaderPath(ShaderPathID.Lit));
                 return m_DefaultShader;
             }
         }
@@ -448,28 +482,22 @@ namespace UnityEngine.Rendering.LWRP
         {
             get { return editorResources.autodeskInteractiveMaskedShader; }
         }
+
+        public override Shader terrainDetailLitShader
+        {
+            get { return editorResources.terrainDetailLitShader; }
+        }
+
+        public override Shader terrainDetailGrassShader
+        {
+            get { return editorResources.terrainDetailGrassShader; }
+        }
+
+        public override Shader terrainDetailGrassBillboardShader
+        {
+            get { return editorResources.terrainDetailGrassBillboardShader; }
+        }
 #endif
-
-        public Shader blitShader
-        {
-            get { return resources != null ? resources.blitShader : null; }
-        }
-
-        public Shader copyDepthShader
-        {
-            get { return resources != null ? resources.copyDepthShader : null; }
-        }
-
-        public Shader screenSpaceShadowShader
-        {
-            get { return resources != null ? resources.screenSpaceShadowShader : null; }
-        }
-
-        public Shader samplingShader
-        {
-            get { return resources != null ? resources.samplingShader : null; }
-        }
-
 
         public void OnBeforeSerialize()
         {
@@ -500,7 +528,7 @@ namespace UnityEngine.Rendering.LWRP
 
         int ValidatePerObjectLights(int value)
         {
-            return System.Math.Max(0, System.Math.Min(value, LightweightRenderPipeline.maxPerObjectLightCount));
+            return System.Math.Max(0, System.Math.Min(value, LightweightRenderPipeline.maxPerObjectLights));
         }
 
         float ValidateRenderScale(float value)

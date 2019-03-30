@@ -79,20 +79,8 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                 }
             }
 
-            return ComputeFrom(probe, referencePosition, referenceRotation);
-        }
+            var result = ComputeFrom(probe, referencePosition, referenceRotation);
 
-        public static ProbeCapturePositionSettings ComputeFrom(
-            HDProbe probe,
-            Vector3 referencePosition, Quaternion referenceRotation
-        )
-        {
-            var result = new ProbeCapturePositionSettings();
-            var proxyToWorld = probe.proxyToWorld;
-            result.proxyPosition = proxyToWorld.GetColumn(3);
-            result.proxyRotation = proxyToWorld.rotation;
-            result.referencePosition = referencePosition;
-            result.referenceRotation = referenceRotation;
             return result;
         }
 
@@ -129,6 +117,20 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
             HashUtilities.QuantisedVectorHash(ref euler, ref h2);
             HashUtilities.AppendHash(ref h2, ref h);
             return h;
+        }
+
+        static ProbeCapturePositionSettings ComputeFrom(
+            HDProbe probe,
+            Vector3 referencePosition, Quaternion referenceRotation
+        )
+        {
+            var result = new ProbeCapturePositionSettings();
+            var proxyToWorld = probe.proxyToWorld;
+            result.proxyPosition = proxyToWorld.GetColumn(3);
+            result.proxyRotation = proxyToWorld.rotation;
+            result.referencePosition = referencePosition;
+            result.referenceRotation = referenceRotation;
+            return result;
         }
     }
 }

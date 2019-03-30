@@ -115,12 +115,6 @@ namespace UnityEngine.Rendering
 #endif
             }
         }
-        public static uint GetPixelOffset(uint eye)
-        {
-            if (!enabled || stereoRenderingMode != StereoRenderingMode.SinglePass)
-                return 0;
-            return (uint)(Mathf.CeilToInt((eye * XRSettings.eyeTextureWidth) / 2));
-        }
 
         public static RenderTextureDescriptor eyeTextureDesc
         {

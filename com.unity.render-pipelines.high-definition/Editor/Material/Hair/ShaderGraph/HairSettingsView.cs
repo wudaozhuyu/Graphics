@@ -46,7 +46,7 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline.Drawing
             {
                 ++indentLevel;
 
-                ps.Add(new PropertyRow(CreateLabel("Blend Preserves Specular", indentLevel)), (row) =>
+                ps.Add(new PropertyRow(CreateLabel("Preserve Specular Lighting", indentLevel)), (row) =>
                 {
                     row.Add(new Toggle(), (toggle) =>
                     {
@@ -55,7 +55,17 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline.Drawing
                     });
                 });
 
-                ps.Add(new PropertyRow(CreateLabel("Fog", indentLevel)), (row) =>
+                m_SortPiorityField = new IntegerField();
+                ps.Add(new PropertyRow(CreateLabel("Sorting Priority", indentLevel)), (row) =>
+                {
+                    row.Add(m_SortPiorityField, (field) =>
+                    {
+                        field.value = m_Node.sortPriority;
+                        field.RegisterValueChangedCallback(ChangeSortPriority);
+                    });
+                });
+
+                ps.Add(new PropertyRow(CreateLabel("Receive Fog", indentLevel)), (row) =>
                 {
                     row.Add(new Toggle(), (toggle) =>
                     {
@@ -73,31 +83,7 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline.Drawing
                     });
                 });
 
-                m_SortPiorityField = new IntegerField();
-                ps.Add(new PropertyRow(CreateLabel("Sort Priority", indentLevel)), (row) =>
-                {
-                    row.Add(m_SortPiorityField, (field) =>
-                    {
-                        field.value = m_Node.sortPriority;
-                        field.RegisterValueChangedCallback(ChangeSortPriority);
-                    });
-                });
-                --indentLevel;
-            }
-
-            ps.Add(new PropertyRow(CreateLabel("Alpha Cutoff", indentLevel)), (row) =>
-            {
-                row.Add(new Toggle(), (toggle) =>
-                {
-                    toggle.value = m_Node.alphaTest.isOn;
-                    toggle.OnToggleChanged(ChangeAlphaTest);
-                });
-            });
-
-            if (m_Node.surfaceType == SurfaceType.Transparent && m_Node.alphaTest.isOn)
-            {
-                ++indentLevel;
-                ps.Add(new PropertyRow(CreateLabel("Alpha Cutoff Depth Prepass", indentLevel)), (row) =>
+                ps.Add(new PropertyRow(CreateLabel("Transparent Depth Prepass", indentLevel)), (row) =>
                 {
                     row.Add(new Toggle(), (toggle) =>
                     {
@@ -106,7 +92,7 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline.Drawing
                     });
                 });
 
-                ps.Add(new PropertyRow(CreateLabel("Alpha Cutoff Depth Postpass", indentLevel)), (row) =>
+                ps.Add(new PropertyRow(CreateLabel("Transparent Depth Postpass", indentLevel)), (row) =>
                 {
                     row.Add(new Toggle(), (toggle) =>
                     {
@@ -115,14 +101,15 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline.Drawing
                     });
                 });
 
-                ps.Add(new PropertyRow(CreateLabel("Alpha Cutoff Shadow", indentLevel)), (row) =>
+                ps.Add(new PropertyRow(CreateLabel("Transparent Writes Motion Vector", indentLevel)), (row) =>
                 {
                     row.Add(new Toggle(), (toggle) =>
                     {
-                        toggle.value = m_Node.alphaTestShadow.isOn;
-                        toggle.OnToggleChanged(ChangeAlphaTestShadow);
+                        toggle.value = m_Node.transparentWritesMotionVec.isOn;
+                        toggle.OnToggleChanged(ChangeTransparentWritesMotionVec);
                     });
                 });
+
                 --indentLevel;
             }
 
@@ -135,26 +122,27 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline.Drawing
                 });
             });
 
-            ps.Add(new PropertyRow(CreateLabel("Transmission", indentLevel)), (row) =>
+            ps.Add(new PropertyRow(CreateLabel("Alpha Clipping", indentLevel)), (row) =>
             {
                 row.Add(new Toggle(), (toggle) =>
                 {
-                    toggle.value = m_Node.transmission.isOn;
-                    toggle.OnToggleChanged(ChangeTransmission);
+                    toggle.value = m_Node.alphaTest.isOn;
+                    toggle.OnToggleChanged(ChangeAlphaTest);
                 });
             });
 
-
-            if (m_Node.surfaceType != SurfaceType.Transparent)
+            if (m_Node.alphaTest.isOn)
             {
-                ps.Add(new PropertyRow(CreateLabel("Subsurface Scattering", indentLevel)), (row) =>
+                ++indentLevel;
+                ps.Add(new PropertyRow(CreateLabel("Use Shadow Threshold", indentLevel)), (row) =>
                 {
                     row.Add(new Toggle(), (toggle) =>
                     {
-                        toggle.value = m_Node.subsurfaceScattering.isOn;
-                        toggle.OnToggleChanged(ChangeSubsurfaceScattering);
+                        toggle.value = m_Node.alphaTestShadow.isOn;
+                        toggle.OnToggleChanged(ChangeAlphaTestShadow);
                     });
                 });
+                --indentLevel;
             }
 
             ps.Add(new PropertyRow(CreateLabel("Receive Decals", indentLevel)), (row) =>
@@ -175,7 +163,7 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline.Drawing
                 });
             });
 
-            ps.Add(new PropertyRow(CreateLabel("Specular AA", indentLevel)), (row) =>
+            ps.Add(new PropertyRow(CreateLabel("Geometric Specular AA", indentLevel)), (row) =>
             {
                 row.Add(new Toggle(), (toggle) =>
                 {
@@ -190,6 +178,33 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline.Drawing
                 {
                     field.value = m_Node.specularOcclusionMode;
                     field.RegisterValueChangedCallback(ChangeSpecularOcclusionMode);
+                });
+            });
+
+            ps.Add(new PropertyRow(CreateLabel("Override Baked GI", indentLevel)), (row) =>
+            {
+                row.Add(new Toggle(), (toggle) =>
+                {
+                    toggle.value = m_Node.overrideBakedGI.isOn;
+                    toggle.OnToggleChanged(ChangeoverrideBakedGI);
+                });
+            });
+
+            ps.Add(new PropertyRow(CreateLabel("Depth Offset", indentLevel)), (row) =>
+            {
+                row.Add(new Toggle(), (toggle) =>
+                {
+                    toggle.value = m_Node.depthOffset.isOn;
+                    toggle.OnToggleChanged(ChangeDepthOffset);
+                });
+            });
+
+            ps.Add(new PropertyRow(CreateLabel("Use Light Facing Normal", indentLevel)), (row) =>
+            {
+                row.Add(new Toggle(), (toggle) =>
+                {
+                    toggle.value = m_Node.useLightFacingNormal.isOn;
+                    toggle.OnToggleChanged(ChangeUseLightFacingNormal);
                 });
             });
 
@@ -212,22 +227,6 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline.Drawing
 
             m_Node.owner.owner.RegisterCompleteObjectUndo("Double-Sided Mode Change");
             m_Node.doubleSidedMode = (DoubleSidedMode)evt.newValue;
-        }
-
-        void ChangeTransmission(ChangeEvent<bool> evt)
-        {
-            m_Node.owner.owner.RegisterCompleteObjectUndo("Transmission Change");
-            ToggleData td = m_Node.transmission;
-            td.isOn = evt.newValue;
-            m_Node.transmission = td;
-        }
-
-        void ChangeSubsurfaceScattering(ChangeEvent<bool> evt)
-        {
-            m_Node.owner.owner.RegisterCompleteObjectUndo("Subsurface Scattering Change");
-            ToggleData td = m_Node.subsurfaceScattering;
-            td.isOn = evt.newValue;
-            m_Node.subsurfaceScattering = td;
         }
 
         void ChangeBlendMode(ChangeEvent<Enum> evt)
@@ -268,7 +267,7 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline.Drawing
 
         void ChangeSortPriority(ChangeEvent<int> evt)
         {
-            m_Node.sortPriority = Math.Max(-HDRenderQueue.k_TransparentPriorityQueueRange, Math.Min(evt.newValue, HDRenderQueue.k_TransparentPriorityQueueRange));
+            m_Node.sortPriority = HDRenderQueue.ClampsTransparentRangePriority(evt.newValue);
             // Force the text to match.
             m_SortPiorityField.value = m_Node.sortPriority;
             if (Equals(m_Node.sortPriority, evt.newValue))
@@ -301,6 +300,14 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline.Drawing
             m_Node.alphaTestDepthPostpass = td;
         }
 
+        void ChangeTransparentWritesMotionVec(ChangeEvent<bool> evt)
+        {
+            m_Node.owner.owner.RegisterCompleteObjectUndo("Transparent Writes Motion Vector Change");
+            ToggleData td = m_Node.transparentWritesMotionVec;
+            td.isOn = evt.newValue;
+            m_Node.transparentWritesMotionVec = td;
+        }
+
         void ChangeAlphaTestShadow(ChangeEvent<bool> evt)
         {
             m_Node.owner.owner.RegisterCompleteObjectUndo("Alpha Test Shadow Change");
@@ -325,6 +332,14 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline.Drawing
             m_Node.receiveSSR = td;
         }
 
+        void ChangeUseLightFacingNormal(ChangeEvent<bool> evt)
+        {
+            m_Node.owner.owner.RegisterCompleteObjectUndo("Use Light Facing Normal Change");
+            ToggleData td = m_Node.useLightFacingNormal;
+            td.isOn = evt.newValue;
+            m_Node.useLightFacingNormal = td;
+        }
+
         void ChangeSpecularAA(ChangeEvent<bool> evt)
         {
             m_Node.owner.owner.RegisterCompleteObjectUndo("Specular AA Change");
@@ -342,6 +357,22 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline.Drawing
             m_Node.specularOcclusionMode = (SpecularOcclusionMode)evt.newValue;
         }
 
+        void ChangeoverrideBakedGI(ChangeEvent<bool> evt)
+        {
+            m_Node.owner.owner.RegisterCompleteObjectUndo("overrideBakedGI Change");
+            ToggleData td = m_Node.overrideBakedGI;
+            td.isOn = evt.newValue;
+            m_Node.overrideBakedGI = td;
+        }
+        
+        void ChangeDepthOffset(ChangeEvent<bool> evt)
+        {
+            m_Node.owner.owner.RegisterCompleteObjectUndo("DepthOffset Change");
+            ToggleData td = m_Node.depthOffset;
+            td.isOn = evt.newValue;
+            m_Node.depthOffset = td;
+        }
+
         public AlphaMode GetAlphaMode(HairMasterNode.AlphaModeLit alphaModeLit)
         {
             switch (alphaModeLit)
@@ -357,7 +388,7 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline.Drawing
                         Debug.LogWarning("Not supported: " + alphaModeLit);
                         return AlphaMode.Alpha;
                     }
-                    
+
             }
         }
 
@@ -375,7 +406,7 @@ namespace UnityEditor.Experimental.Rendering.HDPipeline.Drawing
                     {
                         Debug.LogWarning("Not supported: " + alphaMode);
                         return HairMasterNode.AlphaModeLit.Alpha;
-                    }                    
+                    }
             }
         }
     }
