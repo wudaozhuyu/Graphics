@@ -1,8 +1,14 @@
 editors:
   - version: 2020.1
+    rerun_strategy: on-new-revision
   - version: fast-2020.1
+    rerun_strategy: on-new-revision
   - version: trunk
+    rerun_strategy: on-new-revision
   - version: fast-trunk
+    rerun_strategy: on-new-revision
+  - version: CUSTOM-REVISION
+    rerun_strategy: always
 platforms:
   - name: Win
     os: windows
@@ -12,11 +18,6 @@ platforms:
     components:
       - editor
       - il2cpp
-#  - name: Linux
-#    type: Unity::VM::GPU
-#    image: cds-ops/ubuntu-18.04-base:stable
-#    flavor: b1.large
-# Not sure if Linux supports DXR
 testplatforms:
   - name: Standalone
     args: --suite=playmode --platform=Standalone
@@ -28,20 +29,66 @@ projects:
 win_apis:
   - name: DX12
     cmd: -force-d3d12
-#linux_apis:
-#  - name: OpenGLCore
-#    cmd: -force-glcore
-#  - name: Vulkan
-#    cmd: -force-vulkan
 ---
 {% for project in projects %}
 {% for editor in editors %}
 {% for platform in platforms %}
 
-{% if platform.name == "Win" %}
-
 {% for testplatform in testplatforms %}
 {% for win_api in win_apis %}
+
+{% if testplatform.name == "Standalone" %}
+{{ project.name }}_Win_{{ win_api.name }}_{{ testplatform.name }}_{{ editor.version }}:
+  name : Test {{ project.name }} on Win_{{ win_api.name }}_{{ testplatform.name }} on version {{ editor.version }}
+  agent:
+    flavor: b1.large
+    type: Unity::VM::GPU
+    model: rtx2080
+    image: sdet/gamecode_win10:stable
+  skip_checkout: true
+  commands:
+    - git clone git@github.cds.internal.unity3d.com:unity/utr.git  TestProjects/{{ project.folder }}/utr
+    - pip install unity-downloader-cli --extra-index-url https://artifactory.internal.unity3d.com/api/pypi/common-python/simple
+    
+    - cd TestProjects/{{ project.folder }} && unity-downloader-cli --source-file ../../unity_revision.txt {% for component in platform.components %}-c {{ component }} {% endfor %}--wait --published-only 
+
+    - cd TestProjects/{{ project.folder }} && utr\utr {{ testplatform.args }}Windows64 --artifacts_path=test-results --timeout=1200 --player-load-path=../../players --player-connection-ip=auto
+  artifacts:
+    logs:
+      paths:
+        - "**/test-results/**"
+  dependencies:
+    - path: .yamato/z_editor.yml#editor:priming:{{ editor.version }}:{{ platform.os }}
+      rerun: {{ editor.rerun_strategy }}
+    - path: .yamato/upm-ci-hdrp_standalone.yml#Build_{{ project.name }}_Win_{{ win_api.name }}_Player_{{ editor.version }}
+      rerun: {{ editor.rerun_strategy }}
+  
+Build_{{ project.name }}_Win_{{ win_api.name }}_Player_{{ editor.version }}:
+  name : Build {{ project.name }} on Win_{{ win_api.name }}_Player on version {{ editor.version }}
+  agent:
+    flavor: b1.xlarge
+    type: Unity::VM
+    image: sdet/gamecode_win10:stable
+  commands:
+    - git clone git@github.cds.internal.unity3d.com:unity/utr.git  TestProjects/{{ project.folder }}/utr
+    - pip install unity-downloader-cli --extra-index-url https://artifactory.internal.unity3d.com/api/pypi/common-python/simple
+    
+    - cd TestProjects/{{ project.folder }} && unity-downloader-cli --source-file ../../unity_revision.txt {% for component in platform.components %}-c {{ component }} {% endfor %}--wait --published-only
+
+    - cd TestProjects/{{ project.folder }} && utr\utr {{ testplatform.args }}Windows64 --extra-editor-arg="-executemethod" --extra-editor-arg="CustomBuild.BuildWindows{{ win_api.name }}Linear" --testproject=. --editor-location=.Editor --artifacts_path=test-results --timeout=1200 --player-save-path=../../players --build-only
+  dependencies:
+    - path: .yamato/z_editor.yml#editor:priming:{{ editor.version }}:{{ platform.os }}
+      rerun: {{ editor.rerun_strategy }}
+  artifacts:
+    logs:
+      paths:
+        - "**/test-results/**"
+    players:
+      paths:
+        - "players/**"
+  
+{% else %}
+
 {{ project.name }}_Win_{{ win_api.name }}_{{ testplatform.name }}_{{ editor.version }}:
   name : {{ project.name }} on Win_{{ testplatform.name }}_{{ win_api.name }} on version {{ editor.version }}
   agent:
@@ -54,24 +101,21 @@ win_apis:
     - pip install unity-downloader-cli --extra-index-url https://artifactory.internal.unity3d.com/api/pypi/common-python/simple
     - cd TestProjects/{{ project.folder }} && unity-downloader-cli --source-file ../../unity_revision.txt {% for component in platform.components %}-c {{ component }} {% endfor %}--wait --published-only    
 
-    {% if testplatform.name == "Standalone" %}
-    - cd TestProjects/{{ project.folder }} && utr\utr {{ testplatform.args }}Windows64 --extra-editor-arg="-executemethod" --extra-editor-arg="CustomBuild.BuildWindows{{ win_api.name }}Linear" --testproject=. --editor-location=.Editor --artifacts_path=upm-ci~/test-results --timeout=1200
-    {% else %}
     - cd TestProjects/{{ project.folder }} && utr\utr {{ testplatform.args }} --extra-editor-arg="{{ win_api.cmd }}" --testproject=. --editor-location=.Editor --artifacts_path=upm-ci~/test-results
-    {% endif %}
   dependencies:
     - .yamato/z_editor.yml#editor:priming:{{ editor.version }}:{{ platform.os }}
   artifacts:
     logs:
       paths:
         - "**/test-results/**"
-{% endfor %}    
-{% endfor %}
 
-{% endif %}
+{% endfor %} # win api  
+{% endfor %} # testplatform
 
-{% endfor %}
-{% endfor %}
+{% endif %} # standalone
+
+{% endfor %} # platform
+{% endfor %} # editor
 
 All_{{ project.name }}:
   name: All {{ project.name }} CI
@@ -79,10 +123,6 @@ All_{{ project.name }}:
     type: Unity::VM
     image: cds-ops/ubuntu-18.04-agent:stable
     flavor: b1.small
-  {% if editor.version == 'CUSTOM-REVISION' %}
-  variables:
-    CUSTOM_REVISION: custom_revision_not_set
-  {% endif %}
   commands:
     - dir
   dependencies:
@@ -94,4 +134,4 @@ All_{{ project.name }}:
   {% endfor %}
   {% endfor %}
   
-{% endfor %}
+{% endfor %} #project
