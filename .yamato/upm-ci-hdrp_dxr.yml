@@ -116,10 +116,9 @@ Build_{{ project.name }}_Win_{{ win_api.name }}_Player_{{ editor.version }}:
 
 
 {% endfor %} # platform
-{% endfor %} # editor
 
-All_{{ project.name }}:
-  name: All {{ project.name }} CI
+All_{{ project.name }}_{{ editor.version }}:
+  name: All {{ project.name }} CI - {{ editor.version }}
   agent:
     type: Unity::VM
     image: cds-ops/ubuntu-18.04-agent:stable
@@ -130,9 +129,10 @@ All_{{ project.name }}:
   {% for platform in platforms %}
   {% for testplatform in testplatforms %}
   {% for win_api in win_apis %}
-    - .yamato/upm-ci-{{ project.name | downcase }}.yml#{{ project.name }}_Win_{{ win_api.name }}_{{ testplatform.name }}_trunk
+    - .yamato/upm-ci-{{ project.name | downcase }}.yml#{{ project.name }}_Win_{{ win_api.name }}_{{ testplatform.name }}_{{ editor.version }}
   {% endfor %}
   {% endfor %}
   {% endfor %}
   
 {% endfor %} #project
+{% endfor %} # editor
