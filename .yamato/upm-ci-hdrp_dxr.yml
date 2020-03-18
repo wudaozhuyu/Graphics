@@ -109,10 +109,11 @@ Build_{{ project.name }}_Win_{{ win_api.name }}_Player_{{ editor.version }}:
       paths:
         - "**/test-results/**"
 
+{% endif %} # standalone
 {% endfor %} # win api  
 {% endfor %} # testplatform
 
-{% endif %} # standalone
+
 
 {% endfor %} # platform
 {% endfor %} # editor
