@@ -113,8 +113,6 @@ Build_{{ project.name }}_Win_{{ win_api.name }}_Player_{{ editor.version }}:
 {% endfor %} # win api  
 {% endfor %} # testplatform
 
-
-
 {% endfor %} # platform
 
 All_{{ project.name }}_{{ editor.version }}:
