@@ -44,7 +44,7 @@ win_apis:
     flavor: b1.large
     type: Unity::VM::GPU
     model: rtx2080
-    image: slough-ops/win10-base:1903-stable
+    image: graphics-foundation/win10-dxr:latest
   skip_checkout: true
   commands:
     - git clone git@github.cds.internal.unity3d.com:unity/utr.git  TestProjects/{{ project.folder }}/utr
@@ -65,7 +65,7 @@ Build_{{ project.name }}_Win_{{ win_api.name }}_Player_{{ editor.version }}:
   agent:
     flavor: b1.xlarge
     type: Unity::VM
-    image: slough-ops/win10-base:1903-stable
+    image: graphics-foundation/win10-dxr:latest
   commands:
     - git clone git@github.cds.internal.unity3d.com:unity/utr.git  TestProjects/{{ project.folder }}/utr
     - pip install unity-downloader-cli --extra-index-url https://artifactory.internal.unity3d.com/api/pypi/common-python/simple
