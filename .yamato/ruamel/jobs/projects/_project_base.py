@@ -28,7 +28,7 @@ def _job(project_name, test_platform_name, editor, platform, api, cmd):
     job.set_agent(agent)
     job.add_var_upm_registry()
     job.add_var_custom_revision(editor["version"])
-    job.add_dependencies(dependencies)
+    #job.add_dependencies(dependencies)
     job.add_commands(cmd)
     job.add_artifacts_test_results()
     return job

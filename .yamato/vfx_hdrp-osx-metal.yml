@@ -11,9 +11,6 @@ VFX_HDRP_OSX_Metal_Standalone_2020.1:
         flavor: m1.mac
     variables:
         UPM_REGISTRY: https://artifactory-slo.bf.unity3d.com/artifactory/api/npm/upm-candidates
-    dependencies:
-      -  path: .yamato/_editor.yml#editor:priming:2020.1:macos
-         rerun: on-new-revision
     commands:
       -  curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr --output TestProjects/VisualEffectGraph_HDRP/utr
       -  chmod +x TestProjects/VisualEffectGraph_HDRP/utr
@@ -40,9 +37,6 @@ VFX_HDRP_OSX_Metal_playmode_2020.1:
         flavor: m1.mac
     variables:
         UPM_REGISTRY: https://artifactory-slo.bf.unity3d.com/artifactory/api/npm/upm-candidates
-    dependencies:
-      -  path: .yamato/_editor.yml#editor:priming:2020.1:macos
-         rerun: on-new-revision
     commands:
       -  curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr --output TestProjects/VisualEffectGraph_HDRP/utr
       -  chmod +x TestProjects/VisualEffectGraph_HDRP/utr
@@ -69,9 +63,6 @@ VFX_HDRP_OSX_Metal_editmode_2020.1:
         flavor: m1.mac
     variables:
         UPM_REGISTRY: https://artifactory-slo.bf.unity3d.com/artifactory/api/npm/upm-candidates
-    dependencies:
-      -  path: .yamato/_editor.yml#editor:priming:2020.1:macos
-         rerun: on-new-revision
     commands:
       -  curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr --output TestProjects/VisualEffectGraph_HDRP/utr
       -  chmod +x TestProjects/VisualEffectGraph_HDRP/utr
@@ -98,9 +89,6 @@ VFX_HDRP_OSX_Metal_Standalone_fast-2020.1:
         flavor: m1.mac
     variables:
         UPM_REGISTRY: https://artifactory-slo.bf.unity3d.com/artifactory/api/npm/upm-candidates
-    dependencies:
-      -  path: .yamato/_editor.yml#editor:priming:fast-2020.1:macos
-         rerun: on-new-revision
     commands:
       -  curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr --output TestProjects/VisualEffectGraph_HDRP/utr
       -  chmod +x TestProjects/VisualEffectGraph_HDRP/utr
@@ -127,9 +115,6 @@ VFX_HDRP_OSX_Metal_playmode_fast-2020.1:
         flavor: m1.mac
     variables:
         UPM_REGISTRY: https://artifactory-slo.bf.unity3d.com/artifactory/api/npm/upm-candidates
-    dependencies:
-      -  path: .yamato/_editor.yml#editor:priming:fast-2020.1:macos
-         rerun: on-new-revision
     commands:
       -  curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr --output TestProjects/VisualEffectGraph_HDRP/utr
       -  chmod +x TestProjects/VisualEffectGraph_HDRP/utr
@@ -156,9 +141,6 @@ VFX_HDRP_OSX_Metal_editmode_fast-2020.1:
         flavor: m1.mac
     variables:
         UPM_REGISTRY: https://artifactory-slo.bf.unity3d.com/artifactory/api/npm/upm-candidates
-    dependencies:
-      -  path: .yamato/_editor.yml#editor:priming:fast-2020.1:macos
-         rerun: on-new-revision
     commands:
       -  curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr --output TestProjects/VisualEffectGraph_HDRP/utr
       -  chmod +x TestProjects/VisualEffectGraph_HDRP/utr
@@ -186,9 +168,6 @@ VFX_HDRP_OSX_Metal_Standalone_CUSTOM-REVISION:
     variables:
         UPM_REGISTRY: https://artifactory-slo.bf.unity3d.com/artifactory/api/npm/upm-candidates
         CUSTOM_REVISION: custom_revision_not_set
-    dependencies:
-      -  path: .yamato/_editor.yml#editor:priming:CUSTOM-REVISION:macos
-         rerun: always
     commands:
       -  curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr --output TestProjects/VisualEffectGraph_HDRP/utr
       -  chmod +x TestProjects/VisualEffectGraph_HDRP/utr
@@ -216,9 +195,6 @@ VFX_HDRP_OSX_Metal_playmode_CUSTOM-REVISION:
     variables:
         UPM_REGISTRY: https://artifactory-slo.bf.unity3d.com/artifactory/api/npm/upm-candidates
         CUSTOM_REVISION: custom_revision_not_set
-    dependencies:
-      -  path: .yamato/_editor.yml#editor:priming:CUSTOM-REVISION:macos
-         rerun: always
     commands:
       -  curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr --output TestProjects/VisualEffectGraph_HDRP/utr
       -  chmod +x TestProjects/VisualEffectGraph_HDRP/utr
@@ -246,9 +222,6 @@ VFX_HDRP_OSX_Metal_editmode_CUSTOM-REVISION:
     variables:
         UPM_REGISTRY: https://artifactory-slo.bf.unity3d.com/artifactory/api/npm/upm-candidates
         CUSTOM_REVISION: custom_revision_not_set
-    dependencies:
-      -  path: .yamato/_editor.yml#editor:priming:CUSTOM-REVISION:macos
-         rerun: always
     commands:
       -  curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr --output TestProjects/VisualEffectGraph_HDRP/utr
       -  chmod +x TestProjects/VisualEffectGraph_HDRP/utr
