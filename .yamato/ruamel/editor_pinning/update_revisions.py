@@ -269,7 +269,7 @@ def main(argv):
         if versions_file_is_unchanged(editor_versions_file, ROOT):
             logging.info('No changes in the versions file, exiting')
         else:
-            subprocess.call(['python', 'Unity-Technologies/Graphics/.yamato/ruamel/build.py'])
+            subprocess.call(['python', '.yamato/ruamel/build.py'])
             if args.yamato_parser:
                 logging.info(f'Running {args.yamato_parser} to generate unfolded Yamato YAML...')
                 run_cmd(args.yamato_parser, cwd=ROOT)

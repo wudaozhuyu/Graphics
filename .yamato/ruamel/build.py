@@ -67,6 +67,7 @@ if __name__== "__main__":
     yaml.width = 4096
     yaml.indent(offset=2, mapping=4, sequence=5)
 
+    print(os.path)
     # clear directory from existing yml files, not to have old duplicates etc
     old_yml_files = glob.glob(os.path.join(yamato_dir,'*.yml'), recursive=True)
     for f in old_yml_files:
