@@ -11,6 +11,7 @@ from jobs.preview_publish.yml_pb import create_preview_publish_ymls
 from jobs.templates.yml_template import create_template_ymls
 
 root_dir = os.path.dirname(os.path.dirname(os.getcwd()))
+root_dir = os.getcwd()
 yamato_dir = os.path.join(root_dir,'.yamato')
 config_dir = os.path.join(yamato_dir,'config')
 comment = ''' 
@@ -67,7 +68,6 @@ if __name__== "__main__":
     yaml.width = 4096
     yaml.indent(offset=2, mapping=4, sequence=5)
 
-    print(os.path)
     # clear directory from existing yml files, not to have old duplicates etc
     old_yml_files = glob.glob(os.path.join(yamato_dir,'*.yml'), recursive=True)
     for f in old_yml_files:
