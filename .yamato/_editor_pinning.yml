@@ -20,15 +20,15 @@ update-editor-pinning:
       -  sudo apt-get install yamato-parser -y
       -  |5-
 
-                     if [[ "$GIT_BRANCH" != "9.x.x/yamato/editor-pinning" ]]; then
-                         echo "Should run on '9.x.x/yamato/editor-pinning' but is running on '$GIT_BRANCH'"
+                     if [[ "$GIT_BRANCH" != "9.x.x/yamato/editor-pin" ]]; then
+                         echo "Should run on '9.x.x/yamato/editor-pin' but is running on '$GIT_BRANCH'"
                          exit 1
                      fi
       -  git config --global user.name "noreply@unity3d.com"
       -  git config --global user.email "noreply@unity3d.com"
-      -  pipenv run python3 .yamato/ruamel/editor_pinning/update_revisions.py --target-branch 9.x.x/yamato/editor-pinning-ci --force-push
+      -  pipenv run python3 .yamato/ruamel/editor_pinning/update_revisions.py --target-branch 9.x.x/yamato/editor-pin-ci --force-push
 merge-editor-revisions:
-    name: Merge editor revisions to 9.x.x/yamato/editor-pinning
+    name: Merge editor revisions to 9.x.x/yamato/editor-pin
     agent:
         type: Unity::VM
         image: package-ci/ubuntu:stable
@@ -44,10 +44,10 @@ merge-editor-revisions:
       -  sudo apt-get install yamato-parser -y
       -  |5-
 
-                     if [[ "$GIT_BRANCH" != "9.x.x/yamato/editor-pinning-ci" ]]; then
-                         echo "Should run on '9.x.x/yamato/editor-pinning-ci' but is running on '$GIT_BRANCH'"
+                     if [[ "$GIT_BRANCH" != "9.x.x/yamato/editor-pin-ci" ]]; then
+                         echo "Should run on '9.x.x/yamato/editor-pin-ci' but is running on '$GIT_BRANCH'"
                          exit 1
                      fi
       -  git config --global user.name "noreply@unity3d.com"
       -  git config --global user.email "noreply@unity3d.com"
-      -  pipenv run python3 .yamato/ruamel/editor_pinning/merge_revisions.py --revision $GIT_REVISION --target-branch 9.x.x/yamato/editor-pinning
+      -  pipenv run python3 .yamato/ruamel/editor_pinning/merge_revisions.py --revision $GIT_REVISION --target-branch 9.x.x/yamato/editor-pin
