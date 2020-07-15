@@ -6,4 +6,7 @@ platforms:
   - name: Win
   - name: Linux
   - name: iPhone
-agent: cds_ops_ubuntu_small
+editor_priming_agent: cds_ops_ubuntu_small
+editor_pin_agent: package_ci_ubuntu_small
+target_branch_editor_ci: 9.x.x/yamato/editor-pinning-ci
+target_branch: 9.x.x/yamato/editor-pinning # replace with __shared target branch

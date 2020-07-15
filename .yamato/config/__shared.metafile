@@ -1,4 +1,5 @@
 target_branch: 9.x.x/release # specifies the branch on which recurrent or pr triggers are created, etc
+target_branch_editor_ci: 9.x.x/editor-pinning-ci # specifies the branch on which editor pinning is done
 target_editor: 2020.1 # specifies the target editor used for some package/preview publish jobs
 editors: # applied for all yml files. Override this by specifying override_editors (in the same format) in a specific metafile
   - version: 2020.1
@@ -157,6 +158,10 @@ non_project_agents:
     type: Unity::VM
     image: package-ci/ubuntu:stable
     flavor: b1.large
+  package_ci_ubuntu_small:
+    type: Unity::VM
+    image: package-ci/ubuntu:stable
+    flavor: b1.small
   package_ci_win_large:
     type: Unity::VM
     image: package-ci/win10:stable
