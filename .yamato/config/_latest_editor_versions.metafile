@@ -5,7 +5,7 @@
 # Example:
 # {% for editor_version in editor_version_names %}
 #   editor_version: {{ editor_version }}
-# {% endfor %}
+# {% endfor %} 
 
 editor_version_names:
 - 2019.3_latest_internal
