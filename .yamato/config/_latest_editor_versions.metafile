@@ -51,7 +51,7 @@ editor_versions:
     version: 2020.1.0b16
   2020.1_staging:
     display_name: 2020.1 staging
-    revision: 440e7438337d245ff6af9ba64fd4329a8155a8ae
+    revision: 2ab9c4179772e946654dbec20325cc27a84cf1a5
     version: ''
   2020.2_latest_internal:
     display_name: 2020.2 latest internal
@@ -59,11 +59,11 @@ editor_versions:
     version: 2020.2.0a18
   2020.2_latest_public:
     display_name: 2020.2 latest public
-    revision: 7a5530473e9d
-    version: 2020.2.0a17
+    revision: 4f8709444da6
+    version: 2020.2.0a18
   2020.2_staging:
     display_name: 2020.2 staging
-    revision: ef716c6ae229b2e135455e81928c5164cf662c31
+    revision: 8037ac78137e5807120bddf9b4b00d9241e5210b
     version: ''
   project_revision:
     display_name: project revision

@@ -14,7 +14,7 @@ Universal_Win_DX11_Standalone_2020.1:
     commands:
       -  curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr.bat --output TestProjects/UniversalGraphicsTest/utr.bat
       -  pip install unity-downloader-cli --extra-index-url https://artifactory.internal.unity3d.com/api/pypi/common-python/simple --upgrade
-      -  cd TestProjects/UniversalGraphicsTest && unity-downloader-cli -u 440e7438337d245ff6af9ba64fd4329a8155a8ae -c editor -c il2cpp  --wait --published-only
+      -  cd TestProjects/UniversalGraphicsTest && unity-downloader-cli -u 2ab9c4179772e946654dbec20325cc27a84cf1a5 -c editor -c il2cpp  --wait --published-only
       -  cd Tools && powershell -command ". .\Unity.ps1; Set-ScreenResolution -width 1920 -Height 1080"
       -  cd TestProjects/UniversalGraphicsTest && utr --suite=playmode --platform=StandaloneWindows64 --artifacts_path=test-results --timeout=1200 --player-load-path=../../players --player-connection-ip=auto
     artifacts:
@@ -35,7 +35,7 @@ Build_Universal_Win_DX11_Player_2020.1:
     commands:
       -  curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr.bat --output TestProjects/UniversalGraphicsTest/utr.bat
       -  pip install unity-downloader-cli --extra-index-url https://artifactory.internal.unity3d.com/api/pypi/common-python/simple --upgrade
-      -  cd TestProjects/UniversalGraphicsTest && unity-downloader-cli -u 440e7438337d245ff6af9ba64fd4329a8155a8ae -c editor -c il2cpp  --wait --published-only
+      -  cd TestProjects/UniversalGraphicsTest && unity-downloader-cli -u 2ab9c4179772e946654dbec20325cc27a84cf1a5 -c editor -c il2cpp  --wait --published-only
       -  cd TestProjects/UniversalGraphicsTest && utr --suite=playmode --platform=StandaloneWindows64 --extra-editor-arg="-executemethod" --extra-editor-arg="CustomBuild.BuildWindowsDX11Linear" --testproject=. --editor-location=.Editor --artifacts_path=test-results --timeout=1200 --player-save-path=../../players --build-only
     artifacts:
         logs:
@@ -55,7 +55,7 @@ Universal_Win_DX11_playmode_2020.1:
     commands:
       -  curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr.bat --output TestProjects/UniversalGraphicsTest/utr.bat
       -  pip install unity-downloader-cli --extra-index-url https://artifactory.internal.unity3d.com/api/pypi/common-python/simple --upgrade
-      -  cd TestProjects/UniversalGraphicsTest && unity-downloader-cli -u 440e7438337d245ff6af9ba64fd4329a8155a8ae -c editor -c il2cpp  --wait --published-only
+      -  cd TestProjects/UniversalGraphicsTest && unity-downloader-cli -u 2ab9c4179772e946654dbec20325cc27a84cf1a5 -c editor -c il2cpp  --wait --published-only
       -  cd TestProjects/UniversalGraphicsTest && utr --suite=playmode --testproject=. --editor-location=.Editor --artifacts_path=test-results --extra-editor-arg="-force-d3d11"
     artifacts:
         logs:
@@ -72,7 +72,7 @@ Universal_Win_DX11_editmode_2020.1:
     commands:
       -  curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr.bat --output TestProjects/UniversalGraphicsTest/utr.bat
       -  pip install unity-downloader-cli --extra-index-url https://artifactory.internal.unity3d.com/api/pypi/common-python/simple --upgrade
-      -  cd TestProjects/UniversalGraphicsTest && unity-downloader-cli -u 440e7438337d245ff6af9ba64fd4329a8155a8ae -c editor -c il2cpp  --wait --published-only
+      -  cd TestProjects/UniversalGraphicsTest && unity-downloader-cli -u 2ab9c4179772e946654dbec20325cc27a84cf1a5 -c editor -c il2cpp  --wait --published-only
       -  cd TestProjects/UniversalGraphicsTest && utr --suite=editor --platform=editmode --testproject=. --editor-location=.Editor --artifacts_path=test-results --extra-editor-arg="-force-d3d11"
     artifacts:
         logs:
@@ -89,7 +89,7 @@ Universal_Win_DX11_playmode_XR_2020.1:
     commands:
       -  curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr.bat --output TestProjects/UniversalGraphicsTest/utr.bat
       -  pip install unity-downloader-cli --extra-index-url https://artifactory.internal.unity3d.com/api/pypi/common-python/simple --upgrade
-      -  cd TestProjects/UniversalGraphicsTest && unity-downloader-cli -u 440e7438337d245ff6af9ba64fd4329a8155a8ae -c editor -c il2cpp  --wait --published-only
+      -  cd TestProjects/UniversalGraphicsTest && unity-downloader-cli -u 2ab9c4179772e946654dbec20325cc27a84cf1a5 -c editor -c il2cpp  --wait --published-only
       -  cd TestProjects/UniversalGraphicsTest && utr --suite=playmode --extra-editor-arg="-xr-tests" --testproject=. --editor-location=.Editor --artifacts_path=test-results --extra-editor-arg="-force-d3d11"
     artifacts:
         logs:
@@ -106,7 +106,7 @@ Universal_Win_DX11_Standalone_fast-2020.1:
     commands:
       -  curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr.bat --output TestProjects/UniversalGraphicsTest/utr.bat
       -  pip install unity-downloader-cli --extra-index-url https://artifactory.internal.unity3d.com/api/pypi/common-python/simple --upgrade
-      -  cd TestProjects/UniversalGraphicsTest && unity-downloader-cli -u 440e7438337d245ff6af9ba64fd4329a8155a8ae -c editor -c il2cpp  --wait --published-only
+      -  cd TestProjects/UniversalGraphicsTest && unity-downloader-cli -u 2ab9c4179772e946654dbec20325cc27a84cf1a5 -c editor -c il2cpp  --wait --published-only
       -  cd Tools && powershell -command ". .\Unity.ps1; Set-ScreenResolution -width 1920 -Height 1080"
       -  cd TestProjects/UniversalGraphicsTest && utr --suite=playmode --platform=StandaloneWindows64 --artifacts_path=test-results --timeout=1200 --player-load-path=../../players --player-connection-ip=auto
     artifacts:
@@ -127,7 +127,7 @@ Build_Universal_Win_DX11_Player_fast-2020.1:
     commands:
       -  curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr.bat --output TestProjects/UniversalGraphicsTest/utr.bat
       -  pip install unity-downloader-cli --extra-index-url https://artifactory.internal.unity3d.com/api/pypi/common-python/simple --upgrade
-      -  cd TestProjects/UniversalGraphicsTest && unity-downloader-cli -u 440e7438337d245ff6af9ba64fd4329a8155a8ae -c editor -c il2cpp  --wait --published-only
+      -  cd TestProjects/UniversalGraphicsTest && unity-downloader-cli -u 2ab9c4179772e946654dbec20325cc27a84cf1a5 -c editor -c il2cpp  --wait --published-only
       -  cd TestProjects/UniversalGraphicsTest && utr --suite=playmode --platform=StandaloneWindows64 --extra-editor-arg="-executemethod" --extra-editor-arg="CustomBuild.BuildWindowsDX11Linear" --testproject=. --editor-location=.Editor --artifacts_path=test-results --timeout=1200 --player-save-path=../../players --build-only
     artifacts:
         logs:
@@ -147,7 +147,7 @@ Universal_Win_DX11_playmode_fast-2020.1:
     commands:
       -  curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr.bat --output TestProjects/UniversalGraphicsTest/utr.bat
       -  pip install unity-downloader-cli --extra-index-url https://artifactory.internal.unity3d.com/api/pypi/common-python/simple --upgrade
-      -  cd TestProjects/UniversalGraphicsTest && unity-downloader-cli -u 440e7438337d245ff6af9ba64fd4329a8155a8ae -c editor -c il2cpp  --wait --published-only
+      -  cd TestProjects/UniversalGraphicsTest && unity-downloader-cli -u 2ab9c4179772e946654dbec20325cc27a84cf1a5 -c editor -c il2cpp  --wait --published-only
       -  cd TestProjects/UniversalGraphicsTest && utr --suite=playmode --testproject=. --editor-location=.Editor --artifacts_path=test-results --extra-editor-arg="-force-d3d11"
     artifacts:
         logs:
@@ -164,7 +164,7 @@ Universal_Win_DX11_editmode_fast-2020.1:
     commands:
       -  curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr.bat --output TestProjects/UniversalGraphicsTest/utr.bat
       -  pip install unity-downloader-cli --extra-index-url https://artifactory.internal.unity3d.com/api/pypi/common-python/simple --upgrade
-      -  cd TestProjects/UniversalGraphicsTest && unity-downloader-cli -u 440e7438337d245ff6af9ba64fd4329a8155a8ae -c editor -c il2cpp  --wait --published-only
+      -  cd TestProjects/UniversalGraphicsTest && unity-downloader-cli -u 2ab9c4179772e946654dbec20325cc27a84cf1a5 -c editor -c il2cpp  --wait --published-only
       -  cd TestProjects/UniversalGraphicsTest && utr --suite=editor --platform=editmode --testproject=. --editor-location=.Editor --artifacts_path=test-results --extra-editor-arg="-force-d3d11"
     artifacts:
         logs:
@@ -181,7 +181,7 @@ Universal_Win_DX11_playmode_XR_fast-2020.1:
     commands:
       -  curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr.bat --output TestProjects/UniversalGraphicsTest/utr.bat
       -  pip install unity-downloader-cli --extra-index-url https://artifactory.internal.unity3d.com/api/pypi/common-python/simple --upgrade
-      -  cd TestProjects/UniversalGraphicsTest && unity-downloader-cli -u 440e7438337d245ff6af9ba64fd4329a8155a8ae -c editor -c il2cpp  --wait --published-only
+      -  cd TestProjects/UniversalGraphicsTest && unity-downloader-cli -u 2ab9c4179772e946654dbec20325cc27a84cf1a5 -c editor -c il2cpp  --wait --published-only
       -  cd TestProjects/UniversalGraphicsTest && utr --suite=playmode --extra-editor-arg="-xr-tests" --testproject=. --editor-location=.Editor --artifacts_path=test-results --extra-editor-arg="-force-d3d11"
     artifacts:
         logs:
@@ -199,7 +199,7 @@ Universal_Win_DX11_Standalone_CUSTOM-REVISION:
     commands:
       -  curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr.bat --output TestProjects/UniversalGraphicsTest/utr.bat
       -  pip install unity-downloader-cli --extra-index-url https://artifactory.internal.unity3d.com/api/pypi/common-python/simple --upgrade
-      -  cd TestProjects/UniversalGraphicsTest && unity-downloader-cli -u 440e7438337d245ff6af9ba64fd4329a8155a8ae -c editor -c il2cpp  --wait --published-only
+      -  cd TestProjects/UniversalGraphicsTest && unity-downloader-cli -u 2ab9c4179772e946654dbec20325cc27a84cf1a5 -c editor -c il2cpp  --wait --published-only
       -  cd Tools && powershell -command ". .\Unity.ps1; Set-ScreenResolution -width 1920 -Height 1080"
       -  cd TestProjects/UniversalGraphicsTest && utr --suite=playmode --platform=StandaloneWindows64 --artifacts_path=test-results --timeout=1200 --player-load-path=../../players --player-connection-ip=auto
     artifacts:
@@ -221,7 +221,7 @@ Build_Universal_Win_DX11_Player_CUSTOM-REVISION:
     commands:
       -  curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr.bat --output TestProjects/UniversalGraphicsTest/utr.bat
       -  pip install unity-downloader-cli --extra-index-url https://artifactory.internal.unity3d.com/api/pypi/common-python/simple --upgrade
-      -  cd TestProjects/UniversalGraphicsTest && unity-downloader-cli -u 440e7438337d245ff6af9ba64fd4329a8155a8ae -c editor -c il2cpp  --wait --published-only
+      -  cd TestProjects/UniversalGraphicsTest && unity-downloader-cli -u 2ab9c4179772e946654dbec20325cc27a84cf1a5 -c editor -c il2cpp  --wait --published-only
       -  cd TestProjects/UniversalGraphicsTest && utr --suite=playmode --platform=StandaloneWindows64 --extra-editor-arg="-executemethod" --extra-editor-arg="CustomBuild.BuildWindowsDX11Linear" --testproject=. --editor-location=.Editor --artifacts_path=test-results --timeout=1200 --player-save-path=../../players --build-only
     artifacts:
         logs:
@@ -242,7 +242,7 @@ Universal_Win_DX11_playmode_CUSTOM-REVISION:
     commands:
       -  curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr.bat --output TestProjects/UniversalGraphicsTest/utr.bat
       -  pip install unity-downloader-cli --extra-index-url https://artifactory.internal.unity3d.com/api/pypi/common-python/simple --upgrade
-      -  cd TestProjects/UniversalGraphicsTest && unity-downloader-cli -u 440e7438337d245ff6af9ba64fd4329a8155a8ae -c editor -c il2cpp  --wait --published-only
+      -  cd TestProjects/UniversalGraphicsTest && unity-downloader-cli -u 2ab9c4179772e946654dbec20325cc27a84cf1a5 -c editor -c il2cpp  --wait --published-only
       -  cd TestProjects/UniversalGraphicsTest && utr --suite=playmode --testproject=. --editor-location=.Editor --artifacts_path=test-results --extra-editor-arg="-force-d3d11"
     artifacts:
         logs:
@@ -260,7 +260,7 @@ Universal_Win_DX11_editmode_CUSTOM-REVISION:
     commands:
       -  curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr.bat --output TestProjects/UniversalGraphicsTest/utr.bat
       -  pip install unity-downloader-cli --extra-index-url https://artifactory.internal.unity3d.com/api/pypi/common-python/simple --upgrade
-      -  cd TestProjects/UniversalGraphicsTest && unity-downloader-cli -u 440e7438337d245ff6af9ba64fd4329a8155a8ae -c editor -c il2cpp  --wait --published-only
+      -  cd TestProjects/UniversalGraphicsTest && unity-downloader-cli -u 2ab9c4179772e946654dbec20325cc27a84cf1a5 -c editor -c il2cpp  --wait --published-only
       -  cd TestProjects/UniversalGraphicsTest && utr --suite=editor --platform=editmode --testproject=. --editor-location=.Editor --artifacts_path=test-results --extra-editor-arg="-force-d3d11"
     artifacts:
         logs:
@@ -278,7 +278,7 @@ Universal_Win_DX11_playmode_XR_CUSTOM-REVISION:
     commands:
       -  curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr.bat --output TestProjects/UniversalGraphicsTest/utr.bat
       -  pip install unity-downloader-cli --extra-index-url https://artifactory.internal.unity3d.com/api/pypi/common-python/simple --upgrade
-      -  cd TestProjects/UniversalGraphicsTest && unity-downloader-cli -u 440e7438337d245ff6af9ba64fd4329a8155a8ae -c editor -c il2cpp  --wait --published-only
+      -  cd TestProjects/UniversalGraphicsTest && unity-downloader-cli -u 2ab9c4179772e946654dbec20325cc27a84cf1a5 -c editor -c il2cpp  --wait --published-only
       -  cd TestProjects/UniversalGraphicsTest && utr --suite=playmode --extra-editor-arg="-xr-tests" --testproject=. --editor-location=.Editor --artifacts_path=test-results --extra-editor-arg="-force-d3d11"
     artifacts:
         logs:
