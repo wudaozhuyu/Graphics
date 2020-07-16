@@ -38,6 +38,13 @@ def apply_target_revision_changes(editor_versions_file, yml_files_path, commit, 
         git_cmd(f'apply {diff_filename}')
         os.remove(diff_filename)
         git_cmd(f'add {editor_versions_file}', working_dir)
+        
+        
+        diff_yml = git_cmd(f'diff HEAD..{commit} -- {yml_files_path}')
+        with open(diff_filename, 'w') as diff_file:
+            diff_file.write(diff_yml)
+        git_cmd(f'apply {diff_filename}')
+        os.remove(diff_filename)
         git_cmd(f'add {yml_files_path}', working_dir)
         return True
     return False
