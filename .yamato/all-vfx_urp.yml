@@ -10,13 +10,6 @@ All_VFX_URP_2020.1:
          rerun: on-new-revision
       -  path: .yamato/vfx_urp-win-dx11.yml#VFX_URP_Win_DX11_playmode_2020.1
          rerun: on-new-revision
-All_VFX_URP_fast-2020.1:
-    name: All VFX_URP CI - fast-2020.1
-    dependencies:
-      -  path: .yamato/vfx_urp-win-dx11.yml#VFX_URP_Win_DX11_Standalone_fast-2020.1
-         rerun: on-new-revision
-      -  path: .yamato/vfx_urp-win-dx11.yml#VFX_URP_Win_DX11_playmode_fast-2020.1
-         rerun: on-new-revision
 All_VFX_URP_CUSTOM-REVISION:
     name: All VFX_URP CI - CUSTOM-REVISION
     dependencies:

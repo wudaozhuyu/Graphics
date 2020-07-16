@@ -12,15 +12,6 @@ All_VFX_HDRP_2020.1:
          rerun: on-new-revision
       -  path: .yamato/vfx_hdrp-win-dx11.yml#VFX_HDRP_Win_DX11_playmode_2020.1
          rerun: on-new-revision
-All_VFX_HDRP_fast-2020.1:
-    name: All VFX_HDRP CI - fast-2020.1
-    dependencies:
-      -  path: .yamato/vfx_hdrp-win-dx11.yml#VFX_HDRP_Win_DX11_Standalone_fast-2020.1
-         rerun: on-new-revision
-      -  path: .yamato/vfx_hdrp-win-dx11.yml#VFX_HDRP_Win_DX11_editmode_fast-2020.1
-         rerun: on-new-revision
-      -  path: .yamato/vfx_hdrp-win-dx11.yml#VFX_HDRP_Win_DX11_playmode_fast-2020.1
-         rerun: on-new-revision
 All_VFX_HDRP_CUSTOM-REVISION:
     name: All VFX_HDRP CI - CUSTOM-REVISION
     dependencies:

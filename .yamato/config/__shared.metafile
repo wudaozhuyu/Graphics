@@ -5,9 +5,6 @@ editors: # applied for all yml files. Override this by specifying override_edito
   - version: 2020.1
     rerun_strategy: on-new-revision
     cmd: -u 2020.1
-  - version: fast-2020.1
-    rerun_strategy: on-new-revision
-    cmd: -u 2020.1 --fast
   - version: CUSTOM-REVISION
     rerun_strategy: always
     cmd: -u $CUSTOM_REVISION
