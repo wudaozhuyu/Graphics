@@ -17,8 +17,8 @@ def verify_changed_files(editor_versions_file, commit_hash, working_dir):
 
     assert editor_versions_file in filenames, f'Cannot find {editor_versions_file} in {filenames}'
     filenames.remove(editor_versions_file)
-    assert all(filename.startswith(EXPECTATIONS_PATH) for filename in filenames), (
-        f'Found other files than {editor_versions_file} and expectation files in {filenames}')
+    assert all(filename.startswith(EXPECTATIONS_PATH) or filename.endswith('.yml') for filename in filenames), (
+        f'Found other files than {editor_versions_file}, .yml, and expectation files in {filenames}')
 
 
 def checkout_and_pull_branch(branch, working_dir):
