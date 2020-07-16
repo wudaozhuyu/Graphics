@@ -14,11 +14,8 @@ smoke_test_Standalone_2020.1:
     commands:
       -  curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr.bat --output TestProjects/SRP_SmokeTest/utr.bat
       -  pip install unity-downloader-cli --extra-index-url https://artifactory.internal.unity3d.com/api/pypi/common-python/simple --upgrade
-      -  cd TestProjects/SRP_SmokeTest && unity-downloader-cli --source-file ../../unity_revision.txt -c editor --wait --published-only
+      -  cd TestProjects/SRP_SmokeTest && unity-downloader-cli -u 2ab9c4179772e946654dbec20325cc27a84cf1a5 -c editor --wait --published-only
       -  cd TestProjects/SRP_SmokeTest && utr --suite=playmode --platform=StandaloneWindows64 --testproject=. --editor-location=.Editor --artifacts_path=test-results --timeout=1200
-    dependencies:
-      -  path: .yamato/_editor.yml#editor:priming:2020.1:windows
-         rerun: on-new-revision
     artifacts:
         logs:
             paths:
@@ -34,11 +31,8 @@ smoke_test_playmode_2020.1:
     commands:
       -  curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr.bat --output TestProjects/SRP_SmokeTest/utr.bat
       -  pip install unity-downloader-cli --extra-index-url https://artifactory.internal.unity3d.com/api/pypi/common-python/simple --upgrade
-      -  cd TestProjects/SRP_SmokeTest && unity-downloader-cli --source-file ../../unity_revision.txt -c editor --wait --published-only
+      -  cd TestProjects/SRP_SmokeTest && unity-downloader-cli -u 2ab9c4179772e946654dbec20325cc27a84cf1a5 -c editor --wait --published-only
       -  cd TestProjects/SRP_SmokeTest && utr --suite=playmode --testproject=. --editor-location=.Editor --artifacts_path=test-results
-    dependencies:
-      -  path: .yamato/_editor.yml#editor:priming:2020.1:windows
-         rerun: on-new-revision
     artifacts:
         logs:
             paths:
@@ -54,11 +48,8 @@ smoke_test_editmode_2020.1:
     commands:
       -  curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr.bat --output TestProjects/SRP_SmokeTest/utr.bat
       -  pip install unity-downloader-cli --extra-index-url https://artifactory.internal.unity3d.com/api/pypi/common-python/simple --upgrade
-      -  cd TestProjects/SRP_SmokeTest && unity-downloader-cli --source-file ../../unity_revision.txt -c editor --wait --published-only
+      -  cd TestProjects/SRP_SmokeTest && unity-downloader-cli -u 2ab9c4179772e946654dbec20325cc27a84cf1a5 -c editor --wait --published-only
       -  cd TestProjects/SRP_SmokeTest && utr --suite=editor --platform=editmode --testproject=. --editor-location=.Editor --artifacts_path=test-results
-    dependencies:
-      -  path: .yamato/_editor.yml#editor:priming:2020.1:windows
-         rerun: on-new-revision
     artifacts:
         logs:
             paths:
@@ -140,11 +131,8 @@ smoke_test_Standalone_fast-2020.1:
     commands:
       -  curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr.bat --output TestProjects/SRP_SmokeTest/utr.bat
       -  pip install unity-downloader-cli --extra-index-url https://artifactory.internal.unity3d.com/api/pypi/common-python/simple --upgrade
-      -  cd TestProjects/SRP_SmokeTest && unity-downloader-cli --source-file ../../unity_revision.txt -c editor --wait --published-only
+      -  cd TestProjects/SRP_SmokeTest && unity-downloader-cli -u 2ab9c4179772e946654dbec20325cc27a84cf1a5 -c editor --wait --published-only
       -  cd TestProjects/SRP_SmokeTest && utr --suite=playmode --platform=StandaloneWindows64 --testproject=. --editor-location=.Editor --artifacts_path=test-results --timeout=1200
-    dependencies:
-      -  path: .yamato/_editor.yml#editor:priming:fast-2020.1:windows
-         rerun: on-new-revision
     artifacts:
         logs:
             paths:
@@ -160,11 +148,8 @@ smoke_test_playmode_fast-2020.1:
     commands:
       -  curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr.bat --output TestProjects/SRP_SmokeTest/utr.bat
       -  pip install unity-downloader-cli --extra-index-url https://artifactory.internal.unity3d.com/api/pypi/common-python/simple --upgrade
-      -  cd TestProjects/SRP_SmokeTest && unity-downloader-cli --source-file ../../unity_revision.txt -c editor --wait --published-only
+      -  cd TestProjects/SRP_SmokeTest && unity-downloader-cli -u 2ab9c4179772e946654dbec20325cc27a84cf1a5 -c editor --wait --published-only
       -  cd TestProjects/SRP_SmokeTest && utr --suite=playmode --testproject=. --editor-location=.Editor --artifacts_path=test-results
-    dependencies:
-      -  path: .yamato/_editor.yml#editor:priming:fast-2020.1:windows
-         rerun: on-new-revision
     artifacts:
         logs:
             paths:
@@ -180,11 +165,8 @@ smoke_test_editmode_fast-2020.1:
     commands:
       -  curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr.bat --output TestProjects/SRP_SmokeTest/utr.bat
       -  pip install unity-downloader-cli --extra-index-url https://artifactory.internal.unity3d.com/api/pypi/common-python/simple --upgrade
-      -  cd TestProjects/SRP_SmokeTest && unity-downloader-cli --source-file ../../unity_revision.txt -c editor --wait --published-only
+      -  cd TestProjects/SRP_SmokeTest && unity-downloader-cli -u 2ab9c4179772e946654dbec20325cc27a84cf1a5 -c editor --wait --published-only
       -  cd TestProjects/SRP_SmokeTest && utr --suite=editor --platform=editmode --testproject=. --editor-location=.Editor --artifacts_path=test-results
-    dependencies:
-      -  path: .yamato/_editor.yml#editor:priming:fast-2020.1:windows
-         rerun: on-new-revision
     artifacts:
         logs:
             paths:
@@ -248,11 +230,8 @@ smoke_test_Standalone_CUSTOM-REVISION:
     commands:
       -  curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr.bat --output TestProjects/SRP_SmokeTest/utr.bat
       -  pip install unity-downloader-cli --extra-index-url https://artifactory.internal.unity3d.com/api/pypi/common-python/simple --upgrade
-      -  cd TestProjects/SRP_SmokeTest && unity-downloader-cli --source-file ../../unity_revision.txt -c editor --wait --published-only
+      -  cd TestProjects/SRP_SmokeTest && unity-downloader-cli -u 2ab9c4179772e946654dbec20325cc27a84cf1a5 -c editor --wait --published-only
       -  cd TestProjects/SRP_SmokeTest && utr --suite=playmode --platform=StandaloneWindows64 --testproject=. --editor-location=.Editor --artifacts_path=test-results --timeout=1200
-    dependencies:
-      -  path: .yamato/_editor.yml#editor:priming:CUSTOM-REVISION:windows
-         rerun: always
     artifacts:
         logs:
             paths:
@@ -269,11 +248,8 @@ smoke_test_playmode_CUSTOM-REVISION:
     commands:
       -  curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr.bat --output TestProjects/SRP_SmokeTest/utr.bat
       -  pip install unity-downloader-cli --extra-index-url https://artifactory.internal.unity3d.com/api/pypi/common-python/simple --upgrade
-      -  cd TestProjects/SRP_SmokeTest && unity-downloader-cli --source-file ../../unity_revision.txt -c editor --wait --published-only
+      -  cd TestProjects/SRP_SmokeTest && unity-downloader-cli -u 2ab9c4179772e946654dbec20325cc27a84cf1a5 -c editor --wait --published-only
       -  cd TestProjects/SRP_SmokeTest && utr --suite=playmode --testproject=. --editor-location=.Editor --artifacts_path=test-results
-    dependencies:
-      -  path: .yamato/_editor.yml#editor:priming:CUSTOM-REVISION:windows
-         rerun: always
     artifacts:
         logs:
             paths:
@@ -290,11 +266,8 @@ smoke_test_editmode_CUSTOM-REVISION:
     commands:
       -  curl -s https://artifactory.internal.unity3d.com/core-automation/tools/utr-standalone/utr.bat --output TestProjects/SRP_SmokeTest/utr.bat
       -  pip install unity-downloader-cli --extra-index-url https://artifactory.internal.unity3d.com/api/pypi/common-python/simple --upgrade
-      -  cd TestProjects/SRP_SmokeTest && unity-downloader-cli --source-file ../../unity_revision.txt -c editor --wait --published-only
+      -  cd TestProjects/SRP_SmokeTest && unity-downloader-cli -u 2ab9c4179772e946654dbec20325cc27a84cf1a5 -c editor --wait --published-only
       -  cd TestProjects/SRP_SmokeTest && utr --suite=editor --platform=editmode --testproject=. --editor-location=.Editor --artifacts_path=test-results
-    dependencies:
-      -  path: .yamato/_editor.yml#editor:priming:CUSTOM-REVISION:windows
-         rerun: always
     artifacts:
         logs:
             paths:
