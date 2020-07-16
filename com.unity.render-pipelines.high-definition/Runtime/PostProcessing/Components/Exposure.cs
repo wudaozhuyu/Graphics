@@ -176,27 +176,27 @@ namespace UnityEngine.Rendering.HighDefinition
         /// <summary>
         /// Allows you to manually sets the Scene exposure.
         /// </summary>
-        Fixed = 0,
+        Fixed,
 
         /// <summary>
         /// Automatically sets the exposure depending on what is on screen.
         /// </summary>
-        Automatic = 1,
+        Automatic,
 
         /// <summary>
         /// Automatically sets the exposure depending on what is on screen and can filter out outliers based on provided settings.
         /// </summary>
-        AutomaticHistogram = 4,
+        AutomaticHistogram,
 
         /// <summary>
         /// Maps the current Scene exposure to a custom curve.
         /// </summary>
-        CurveMapping = 2,
+        CurveMapping,
 
         /// <summary>
         /// Uses the current physical Camera settings to set the Scene exposure.
         /// </summary>
-        UsePhysicalCamera = 3
+        UsePhysicalCamera
     }
 
     /// <summary>
