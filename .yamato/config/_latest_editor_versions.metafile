@@ -7,7 +7,7 @@
 #   editor_version: {{ editor_version }}
 # {% endfor %} 
 
-editor_version_names:
+editor_version_names:  
 - 2019.3_latest_internal
 - 2019.3_latest_public
 - 2019.3_staging
