@@ -11,7 +11,7 @@ trunk_track: '2020.2'
 editor_versions_file: .yamato/config/_latest_editor_versions.metafile
 project_version_file: .yamato/ruamel/editor_pinning/version.txt
 ruamel_build_file: .yamato/ruamel/build.py
-yml_files_location: .yamato/*.yml
+yml_files_path: .yamato/*.yml
 
 # Components to have unity-downloader-cli to trigger.
 unity_downloader_components:
