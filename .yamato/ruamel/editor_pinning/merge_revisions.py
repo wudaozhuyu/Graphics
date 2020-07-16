@@ -26,7 +26,7 @@ def checkout_and_pull_branch(branch, working_dir):
     git_cmd('pull --ff-only', working_dir)
 
 
-def apply_target_revision_changes(editor_versions_file, commit, working_dir):
+def apply_target_revision_changes(editor_versions_file, yml_files_path, commit, working_dir):
     """Apply the changes for the .metafile only (since expectations might have conflicts)
         Returns: True if any changes were applied, False otherwise.
     """
@@ -38,6 +38,7 @@ def apply_target_revision_changes(editor_versions_file, commit, working_dir):
         git_cmd(f'apply {diff_filename}')
         os.remove(diff_filename)
         git_cmd(f'add {editor_versions_file}', working_dir)
+        git_cmd(f'add {yml_files_path}', working_dir)
         return True
     return False
 
@@ -96,7 +97,7 @@ def main(argv):
             if git_cmd('rev-parse HEAD').strip() == args.revision:
                 logging.info('No changes compared to current revision. Exiting...')
                 return 0
-        if apply_target_revision_changes(editor_versions_file, args.revision, working_dir):
+        if apply_target_revision_changes(editor_versions_file, config['yml_files_path'], args.revision, working_dir):
             if args.yamato_parser:
                 regenerate_expectations(args.yamato_parser, working_dir)
             commit_msg = get_commit_message(args.revision)

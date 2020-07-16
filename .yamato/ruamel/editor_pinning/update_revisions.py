@@ -144,12 +144,12 @@ def get_current_branch():
     return git_cmd("rev-parse --abbrev-ref HEAD").strip()
 
 
-def checkout_and_push(editor_versions_file, yml_files_location, target_branch, root, force_push,
+def checkout_and_push(editor_versions_file, yml_files_path, target_branch, root, force_push,
                       commit_message_details):
     original_branch = get_current_branch()
     git_cmd(f'checkout -B {target_branch}', cwd=root)
     git_cmd(f'add {editor_versions_file}', cwd=root)
-    git_cmd(f'add {yml_files_location}', cwd=root)
+    git_cmd(f'add {yml_files_path}', cwd=root)
 
     # Expectations generated if yamato-parser is used:
     expectations_dir = os.path.join(root, EXPECTATIONS_PATH)
@@ -275,7 +275,7 @@ def main(argv):
                 logging.info(f'Running {args.yamato_parser} to generate unfolded Yamato YAML...')
                 run_cmd(args.yamato_parser, cwd=ROOT)
             if not args.local:
-                checkout_and_push(editor_versions_file, config['yml_files_location'], args.target_branch, ROOT, args.force_push,
+                checkout_and_push(editor_versions_file, config['yml_files_path'], args.target_branch, ROOT, args.force_push,
                                   'Updating pinned editor revisions')
         logging.info('Done updating editor versions.')
         return 0
