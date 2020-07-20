@@ -19,8 +19,7 @@ platforms:
         standalone_build:
           type: Unity::VM
           image: graphics-foundation/win10-dxr:stable
-          flavor: b1.large
-          model: rtx2080
+          flavor: b1.xlarge
 all:
   dependencies:
     - platform: Win
