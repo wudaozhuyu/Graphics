@@ -5,6 +5,7 @@ test_platforms:
   - Standalone
   - playmode
   - playmode_XR
+  - playmode_RenderGraph
 platforms:
   - name: Win
     apis:
@@ -28,3 +29,5 @@ all:
         - Standalone
         - playmode
         - playmode_XR
+        - playmode_RenderGraph
+
