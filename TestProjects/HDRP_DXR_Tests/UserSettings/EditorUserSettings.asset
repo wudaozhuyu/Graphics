@@ -5,9 +5,6 @@ EditorUserSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 4
   m_ConfigSettings:
-    RecentlyUsedScenePath-0:
-      value: 22424703114646680e0b0227036c0e40462836251e293f043f281e3aece7113ee4e235fdf4742a323016f6
-      flags: 0
     lightmappingDeviceAndPlatform:
       value: 53
       flags: 0
@@ -21,7 +18,5 @@ EditorUserSettings:
   m_SemanticMergeMode: 2
   m_VCShowFailedCheckout: 1
   m_VCOverwriteFailedCheckoutAssets: 1
-  m_VCProjectOverlayIcons: 1
-  m_VCHierarchyOverlayIcons: 1
-  m_VCOtherOverlayIcons: 1
+  m_VCOverlayIcons: 1
   m_VCAllowAsyncUpdate: 0
