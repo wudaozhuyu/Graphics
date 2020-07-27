@@ -20,7 +20,7 @@
   },
   "lint-staged": {
     "../**/*": [
-        "python -m git-hook.precommit.check-file-name-extension"
+      "python -m git-hook.precommit.check-file-name-extension"
     ]
   }
 }
