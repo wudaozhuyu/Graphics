@@ -127,6 +127,10 @@ namespace UnityEngine.Rendering.HighDefinition
             tfResources.historyDepthTexture = hdCamera.GetCurrentFrameRT((int)HDCameraFrameHistoryType.Depth);
             tfResources.historyNormalTexture = hdCamera.GetCurrentFrameRT((int)HDCameraFrameHistoryType.Normal);
             tfResources.noisyBuffer = noisyBuffer;
+            if (hdCamera.frameSettings.IsEnabled(FrameSettingsField.MotionVectors))
+                tfResources.motionVectorBuffer = m_SharedRTManager.GetMotionVectorsBuffer();
+            else
+                tfResources.motionVectorBuffer = TextureXR.GetBlackTexture();
 
             // Temporary buffers
             tfResources.validationBuffer = validationBuffer;
