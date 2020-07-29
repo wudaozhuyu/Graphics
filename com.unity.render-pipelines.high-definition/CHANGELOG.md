@@ -164,6 +164,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Added API to check if a Camera, Light or ReflectionProbe is compatible with HDRP.
 - Added path tracing test scene for normal mapping.
 - Added missing API documentation.
+- Added render graph support of RTAO and required denoisers.
 
 ### Fixed
 - Fix when rescale probe all direction below zero (1219246)

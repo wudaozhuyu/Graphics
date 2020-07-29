@@ -10,7 +10,7 @@ namespace UnityEngine.Rendering.HighDefinition
             return renderGraph.CreateTexture(new TextureDesc(Vector2.one, true, true) { enableRandomWrite = true, colorFormat = GraphicsFormat.R8_UNorm, name = "Ambient Occlusion" });
         }
 
-        public TextureHandle Render(RenderGraph renderGraph, HDCamera hdCamera, TextureHandle depthPyramid, TextureHandle normalBuffer, TextureHandle motionVectors, int frameCount, in HDUtils.PackedMipChainInfo depthMipInfo)
+        public TextureHandle Render(RenderGraph renderGraph, HDCamera hdCamera, TextureHandle depthPyramid, TextureHandle normalBuffer, TextureHandle motionVectors, int frameCount, in HDUtils.PackedMipChainInfo depthMipInfo, ShaderVariablesRaytracing shaderVariablesRaytracing, TextureHandle rayCountTexture)
         {
             var settings = hdCamera.volumeStack.GetComponent<AmbientOcclusion>();
 
@@ -19,8 +19,13 @@ namespace UnityEngine.Rendering.HighDefinition
             // So we can't rely on automatic pass stripping. This is why we have to be explicit here.
             if (IsActive(hdCamera, settings))
             {
+                // Size must be checked independently of what version should be used
+                EnsureRTSize(settings, hdCamera);
+
+                if (hdCamera.frameSettings.IsEnabled(FrameSettingsField.RayTracing) && settings.rayTracing.value)
+                    return m_RaytracingAmbientOcclusion.RenderRTAO(renderGraph, hdCamera, depthPyramid, normalBuffer, motionVectors, rayCountTexture, frameCount, shaderVariablesRaytracing);
+                else
                 {
-                    EnsureRTSize(settings, hdCamera);
 
                     var historyRT = hdCamera.GetCurrentFrameRT((int)HDCameraFrameHistoryType.AmbientOcclusion);
                     var currentHistory = renderGraph.ImportTexture(historyRT);
@@ -38,7 +43,7 @@ namespace UnityEngine.Rendering.HighDefinition
             }
             else
             {
-                result = renderGraph.ImportTexture(TextureXR.GetBlackTexture());
+                result = renderGraph.defaultResources.blackTextureXR;
             }
             return result;
         }
